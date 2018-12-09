@@ -87,6 +87,20 @@ abstract class User implements ActiveRecordInterface
     protected $password;
 
     /**
+     * The value for the name field.
+     *
+     * @var        string
+     */
+    protected $name;
+
+    /**
+     * The value for the permissions field.
+     *
+     * @var        int
+     */
+    protected $permissions;
+
+    /**
      * The value for the picture field.
      *
      * @var        resource
@@ -409,6 +423,26 @@ abstract class User implements ActiveRecordInterface
     }
 
     /**
+     * Get the [name] column value.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get the [permissions] column value.
+     *
+     * @return int
+     */
+    public function getPermissions()
+    {
+        return $this->permissions;
+    }
+
+    /**
      * Get the [picture] column value.
      *
      * @return resource
@@ -497,6 +531,46 @@ abstract class User implements ActiveRecordInterface
 
         return $this;
     } // setPassword()
+
+    /**
+     * Set the value of [name] column.
+     *
+     * @param string $v new value
+     * @return $this|\User The current object (for fluent API support)
+     */
+    public function setName($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->name !== $v) {
+            $this->name = $v;
+            $this->modifiedColumns[UserTableMap::COL_NAME] = true;
+        }
+
+        return $this;
+    } // setName()
+
+    /**
+     * Set the value of [permissions] column.
+     *
+     * @param int $v new value
+     * @return $this|\User The current object (for fluent API support)
+     */
+    public function setPermissions($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->permissions !== $v) {
+            $this->permissions = $v;
+            $this->modifiedColumns[UserTableMap::COL_PERMISSIONS] = true;
+        }
+
+        return $this;
+    } // setPermissions()
 
     /**
      * Set the value of [picture] column.
@@ -603,7 +677,13 @@ abstract class User implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : UserTableMap::translateFieldName('Password', TableMap::TYPE_PHPNAME, $indexType)];
             $this->password = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : UserTableMap::translateFieldName('Picture', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : UserTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->name = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : UserTableMap::translateFieldName('Permissions', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->permissions = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : UserTableMap::translateFieldName('Picture', TableMap::TYPE_PHPNAME, $indexType)];
             if (null !== $col) {
                 $this->picture = fopen('php://memory', 'r+');
                 fwrite($this->picture, $col);
@@ -612,10 +692,10 @@ abstract class User implements ActiveRecordInterface
                 $this->picture = null;
             }
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : UserTableMap::translateFieldName('Creationtime', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : UserTableMap::translateFieldName('Creationtime', TableMap::TYPE_PHPNAME, $indexType)];
             $this->creationtime = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : UserTableMap::translateFieldName('Lastactivitytime', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : UserTableMap::translateFieldName('Lastactivitytime', TableMap::TYPE_PHPNAME, $indexType)];
             $this->lastactivitytime = (null !== $col) ? PropelDateTime::newInstance($col, null, 'DateTime') : null;
             $this->resetModified();
 
@@ -625,7 +705,7 @@ abstract class User implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = UserTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = UserTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\User'), 0, $e);
@@ -909,6 +989,12 @@ abstract class User implements ActiveRecordInterface
         if ($this->isColumnModified(UserTableMap::COL_PASSWORD)) {
             $modifiedColumns[':p' . $index++]  = 'password';
         }
+        if ($this->isColumnModified(UserTableMap::COL_NAME)) {
+            $modifiedColumns[':p' . $index++]  = 'name';
+        }
+        if ($this->isColumnModified(UserTableMap::COL_PERMISSIONS)) {
+            $modifiedColumns[':p' . $index++]  = 'permissions';
+        }
         if ($this->isColumnModified(UserTableMap::COL_PICTURE)) {
             $modifiedColumns[':p' . $index++]  = 'picture';
         }
@@ -934,6 +1020,12 @@ abstract class User implements ActiveRecordInterface
                         break;
                     case 'password':
                         $stmt->bindValue($identifier, $this->password, PDO::PARAM_STR);
+                        break;
+                    case 'name':
+                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
+                        break;
+                    case 'permissions':
+                        $stmt->bindValue($identifier, $this->permissions, PDO::PARAM_INT);
                         break;
                     case 'picture':
                         if (is_resource($this->picture)) {
@@ -1009,12 +1101,18 @@ abstract class User implements ActiveRecordInterface
                 return $this->getPassword();
                 break;
             case 2:
-                return $this->getPicture();
+                return $this->getName();
                 break;
             case 3:
-                return $this->getCreationtime();
+                return $this->getPermissions();
                 break;
             case 4:
+                return $this->getPicture();
+                break;
+            case 5:
+                return $this->getCreationtime();
+                break;
+            case 6:
                 return $this->getLastactivitytime();
                 break;
             default:
@@ -1049,16 +1147,18 @@ abstract class User implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getUsername(),
             $keys[1] => $this->getPassword(),
-            $keys[2] => $this->getPicture(),
-            $keys[3] => $this->getCreationtime(),
-            $keys[4] => $this->getLastactivitytime(),
+            $keys[2] => $this->getName(),
+            $keys[3] => $this->getPermissions(),
+            $keys[4] => $this->getPicture(),
+            $keys[5] => $this->getCreationtime(),
+            $keys[6] => $this->getLastactivitytime(),
         );
-        if ($result[$keys[3]] instanceof \DateTimeInterface) {
-            $result[$keys[3]] = $result[$keys[3]]->format('c');
+        if ($result[$keys[5]] instanceof \DateTimeInterface) {
+            $result[$keys[5]] = $result[$keys[5]]->format('c');
         }
 
-        if ($result[$keys[4]] instanceof \DateTimeInterface) {
-            $result[$keys[4]] = $result[$keys[4]]->format('c');
+        if ($result[$keys[6]] instanceof \DateTimeInterface) {
+            $result[$keys[6]] = $result[$keys[6]]->format('c');
         }
 
         $virtualColumns = $this->virtualColumns;
@@ -1168,12 +1268,18 @@ abstract class User implements ActiveRecordInterface
                 $this->setPassword($value);
                 break;
             case 2:
-                $this->setPicture($value);
+                $this->setName($value);
                 break;
             case 3:
-                $this->setCreationtime($value);
+                $this->setPermissions($value);
                 break;
             case 4:
+                $this->setPicture($value);
+                break;
+            case 5:
+                $this->setCreationtime($value);
+                break;
+            case 6:
                 $this->setLastactivitytime($value);
                 break;
         } // switch()
@@ -1209,13 +1315,19 @@ abstract class User implements ActiveRecordInterface
             $this->setPassword($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
-            $this->setPicture($arr[$keys[2]]);
+            $this->setName($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setCreationtime($arr[$keys[3]]);
+            $this->setPermissions($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setLastactivitytime($arr[$keys[4]]);
+            $this->setPicture($arr[$keys[4]]);
+        }
+        if (array_key_exists($keys[5], $arr)) {
+            $this->setCreationtime($arr[$keys[5]]);
+        }
+        if (array_key_exists($keys[6], $arr)) {
+            $this->setLastactivitytime($arr[$keys[6]]);
         }
     }
 
@@ -1263,6 +1375,12 @@ abstract class User implements ActiveRecordInterface
         }
         if ($this->isColumnModified(UserTableMap::COL_PASSWORD)) {
             $criteria->add(UserTableMap::COL_PASSWORD, $this->password);
+        }
+        if ($this->isColumnModified(UserTableMap::COL_NAME)) {
+            $criteria->add(UserTableMap::COL_NAME, $this->name);
+        }
+        if ($this->isColumnModified(UserTableMap::COL_PERMISSIONS)) {
+            $criteria->add(UserTableMap::COL_PERMISSIONS, $this->permissions);
         }
         if ($this->isColumnModified(UserTableMap::COL_PICTURE)) {
             $criteria->add(UserTableMap::COL_PICTURE, $this->picture);
@@ -1361,6 +1479,8 @@ abstract class User implements ActiveRecordInterface
     {
         $copyObj->setUsername($this->getUsername());
         $copyObj->setPassword($this->getPassword());
+        $copyObj->setName($this->getName());
+        $copyObj->setPermissions($this->getPermissions());
         $copyObj->setPicture($this->getPicture());
         $copyObj->setCreationtime($this->getCreationtime());
         $copyObj->setLastactivitytime($this->getLastactivitytime());
@@ -2386,6 +2506,8 @@ abstract class User implements ActiveRecordInterface
     {
         $this->username = null;
         $this->password = null;
+        $this->name = null;
+        $this->permissions = null;
         $this->picture = null;
         $this->creationtime = null;
         $this->lastactivitytime = null;

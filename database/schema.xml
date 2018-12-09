@@ -3,6 +3,8 @@
   <table name="user" phpName="User">
 	<column name="username" type="varchar" size="24" required="true" primaryKey="true" />
 	<column name="password" type="varchar" size="255" required="true" />
+	<column name="name" type="varchar" size="100" required="true" />
+	<column name="permissions" type="tinyint" required="true" />
 	<column name="picture" type="blob" />
 	<column name="creationTime" type="timestamp" required="true" />
 	<column name="lastActivityTime" type="timestamp" required="true" />

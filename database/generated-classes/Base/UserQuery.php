@@ -22,12 +22,16 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildUserQuery orderByUsername($order = Criteria::ASC) Order by the username column
  * @method     ChildUserQuery orderByPassword($order = Criteria::ASC) Order by the password column
+ * @method     ChildUserQuery orderByName($order = Criteria::ASC) Order by the name column
+ * @method     ChildUserQuery orderByPermissions($order = Criteria::ASC) Order by the permissions column
  * @method     ChildUserQuery orderByPicture($order = Criteria::ASC) Order by the picture column
  * @method     ChildUserQuery orderByCreationtime($order = Criteria::ASC) Order by the creationTime column
  * @method     ChildUserQuery orderByLastactivitytime($order = Criteria::ASC) Order by the lastActivityTime column
  *
  * @method     ChildUserQuery groupByUsername() Group by the username column
  * @method     ChildUserQuery groupByPassword() Group by the password column
+ * @method     ChildUserQuery groupByName() Group by the name column
+ * @method     ChildUserQuery groupByPermissions() Group by the permissions column
  * @method     ChildUserQuery groupByPicture() Group by the picture column
  * @method     ChildUserQuery groupByCreationtime() Group by the creationTime column
  * @method     ChildUserQuery groupByLastactivitytime() Group by the lastActivityTime column
@@ -87,6 +91,8 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildUser findOneByUsername(string $username) Return the first ChildUser filtered by the username column
  * @method     ChildUser findOneByPassword(string $password) Return the first ChildUser filtered by the password column
+ * @method     ChildUser findOneByName(string $name) Return the first ChildUser filtered by the name column
+ * @method     ChildUser findOneByPermissions(int $permissions) Return the first ChildUser filtered by the permissions column
  * @method     ChildUser findOneByPicture(resource $picture) Return the first ChildUser filtered by the picture column
  * @method     ChildUser findOneByCreationtime(string $creationTime) Return the first ChildUser filtered by the creationTime column
  * @method     ChildUser findOneByLastactivitytime(string $lastActivityTime) Return the first ChildUser filtered by the lastActivityTime column *
@@ -96,6 +102,8 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildUser requireOneByUsername(string $username) Return the first ChildUser filtered by the username column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildUser requireOneByPassword(string $password) Return the first ChildUser filtered by the password column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildUser requireOneByName(string $name) Return the first ChildUser filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildUser requireOneByPermissions(int $permissions) Return the first ChildUser filtered by the permissions column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildUser requireOneByPicture(resource $picture) Return the first ChildUser filtered by the picture column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildUser requireOneByCreationtime(string $creationTime) Return the first ChildUser filtered by the creationTime column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildUser requireOneByLastactivitytime(string $lastActivityTime) Return the first ChildUser filtered by the lastActivityTime column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
@@ -103,6 +111,8 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUser[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildUser objects based on current ModelCriteria
  * @method     ChildUser[]|ObjectCollection findByUsername(string $username) Return ChildUser objects filtered by the username column
  * @method     ChildUser[]|ObjectCollection findByPassword(string $password) Return ChildUser objects filtered by the password column
+ * @method     ChildUser[]|ObjectCollection findByName(string $name) Return ChildUser objects filtered by the name column
+ * @method     ChildUser[]|ObjectCollection findByPermissions(int $permissions) Return ChildUser objects filtered by the permissions column
  * @method     ChildUser[]|ObjectCollection findByPicture(resource $picture) Return ChildUser objects filtered by the picture column
  * @method     ChildUser[]|ObjectCollection findByCreationtime(string $creationTime) Return ChildUser objects filtered by the creationTime column
  * @method     ChildUser[]|ObjectCollection findByLastactivitytime(string $lastActivityTime) Return ChildUser objects filtered by the lastActivityTime column
@@ -204,7 +214,7 @@ abstract class UserQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT username, password, picture, creationTime, lastActivityTime FROM user WHERE username = :p0';
+        $sql = 'SELECT username, password, name, permissions, picture, creationTime, lastActivityTime FROM user WHERE username = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_STR);
@@ -342,6 +352,72 @@ abstract class UserQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(UserTableMap::COL_PASSWORD, $password, $comparison);
+    }
+
+    /**
+     * Filter the query on the name column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
+     * $query->filterByName('%fooValue%', Criteria::LIKE); // WHERE name LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $name The value to use as filter.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildUserQuery The current query, for fluid interface
+     */
+    public function filterByName($name = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($name)) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(UserTableMap::COL_NAME, $name, $comparison);
+    }
+
+    /**
+     * Filter the query on the permissions column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPermissions(1234); // WHERE permissions = 1234
+     * $query->filterByPermissions(array(12, 34)); // WHERE permissions IN (12, 34)
+     * $query->filterByPermissions(array('min' => 12)); // WHERE permissions > 12
+     * </code>
+     *
+     * @param     mixed $permissions The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildUserQuery The current query, for fluid interface
+     */
+    public function filterByPermissions($permissions = null, $comparison = null)
+    {
+        if (is_array($permissions)) {
+            $useMinMax = false;
+            if (isset($permissions['min'])) {
+                $this->addUsingAlias(UserTableMap::COL_PERMISSIONS, $permissions['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($permissions['max'])) {
+                $this->addUsingAlias(UserTableMap::COL_PERMISSIONS, $permissions['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(UserTableMap::COL_PERMISSIONS, $permissions, $comparison);
     }
 
     /**
