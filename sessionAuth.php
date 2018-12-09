@@ -13,7 +13,7 @@ class SessionAuth
         $_SESSION['hmac'] = hash_hmac('sha256', $username + $permissions, SERVER_KEY);
     }
 
-    static function isSessionValid()
+    static function isValid()
     {
         if (isset($_SESSION['hmac']) && isset($_SESSION['username']) && isset($_SESSION['permissions'])) {
             return hash_equals($_SESSION['hmac'], hash_hmac('sha256', $_SESSION['username'] + $_SESSION['permissions'], SERVER_KEY));
