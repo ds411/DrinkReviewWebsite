@@ -1,11 +1,5 @@
 <?php
 
-session_start();
-
-require "vendor/autoload.php";
-require "database/generated-conf/config.php";
-require "sessionAuth.php";
-
 $title = "Register or Login";
 
 $content = <<<EOF
@@ -58,6 +52,4 @@ $content = <<<EOF
         </script>
 	</div>
 EOF;
-
-include 'template.php';
 ?>

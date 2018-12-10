@@ -19,6 +19,7 @@ else if(!password_verify($_POST['password'], $user->getPassword())) {
 else {
     SessionAuth::initSession($_POST['username'], $user->getPermissions());
     require "feed.php";
+    echo $content;
 }
 
 ?>

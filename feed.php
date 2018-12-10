@@ -71,6 +71,4 @@ foreach($initialFeedPosts as $post) {
 }
 
 $content = sprintf($content, $initialFeed);
-
-include 'template.php';
 ?>

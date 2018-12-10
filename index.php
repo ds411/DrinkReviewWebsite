@@ -15,5 +15,6 @@ if(SessionAuth::isValid()) {
 else {
 	include "loginForm.php";
 }
+include "template.php";
 
 ?>

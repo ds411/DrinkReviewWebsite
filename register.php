@@ -33,6 +33,7 @@ else {
         ->save();
     SessionAuth::initSession($_POST['username'], 0);
     require "feed.php";
+    echo $content;
 }
 
 
