@@ -14,7 +14,7 @@ $content = "";
 foreach($models as $model) {
     $style = $model->getStyle();
     $description = $model->getDescription();
-    $content .= "<div><h3>$style</h3><p>$description</p></div>";
+    $content .= "<div><a href='style.php?s=$style'><div><h3>$style</h3><p>$description</p></div></a></div>";
 }
 
 ?>
