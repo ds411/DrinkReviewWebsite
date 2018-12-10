@@ -172,6 +172,13 @@ class DrinkTableMap extends TableMap
     1 => ':style',
   ),
 ), 'CASCADE', null, null, false);
+        $this->addRelation('Review', '\\Review', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':drink_id',
+    1 => ':id',
+  ),
+), 'CASCADE', null, 'Reviews', false);
         $this->addRelation('Wishlist', '\\Wishlist', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
@@ -187,6 +194,7 @@ class DrinkTableMap extends TableMap
     {
         // Invalidate objects in related instance pools,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        ReviewTableMap::clearInstancePool();
         WishlistTableMap::clearInstancePool();
     }
 

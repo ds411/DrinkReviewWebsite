@@ -93,11 +93,14 @@ DROP TABLE IF EXISTS [review];
 
 CREATE TABLE [review]
 (
-    [id] INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     [rating] DECIMAL NOT NULL,
+    [drink_id] INTEGER NOT NULL,
     [post_id] INTEGER NOT NULL,
-    UNIQUE ([id],[post_id]),
+    PRIMARY KEY ([post_id]),
+    UNIQUE ([post_id]),
     FOREIGN KEY ([post_id]) REFERENCES [post] ([id])
+        ON DELETE CASCADE,
+    FOREIGN KEY ([drink_id]) REFERENCES [drink] ([id])
         ON DELETE CASCADE
 );
 

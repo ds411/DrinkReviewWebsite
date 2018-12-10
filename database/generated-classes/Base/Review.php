@@ -2,6 +2,8 @@
 
 namespace Base;
 
+use \Drink as ChildDrink;
+use \DrinkQuery as ChildDrinkQuery;
 use \Post as ChildPost;
 use \PostQuery as ChildPostQuery;
 use \ReviewQuery as ChildReviewQuery;
@@ -62,18 +64,18 @@ abstract class Review implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the id field.
-     *
-     * @var        int
-     */
-    protected $id;
-
-    /**
      * The value for the rating field.
      *
      * @var        string
      */
     protected $rating;
+
+    /**
+     * The value for the drink_id field.
+     *
+     * @var        int
+     */
+    protected $drink_id;
 
     /**
      * The value for the post_id field.
@@ -86,6 +88,11 @@ abstract class Review implements ActiveRecordInterface
      * @var        ChildPost
      */
     protected $aPost;
+
+    /**
+     * @var        ChildDrink
+     */
+    protected $aDrink;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -321,16 +328,6 @@ abstract class Review implements ActiveRecordInterface
     }
 
     /**
-     * Get the [id] column value.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
      * Get the [rating] column value.
      *
      * @return string
@@ -338,6 +335,16 @@ abstract class Review implements ActiveRecordInterface
     public function getRating()
     {
         return $this->rating;
+    }
+
+    /**
+     * Get the [drink_id] column value.
+     *
+     * @return int
+     */
+    public function getDrinkId()
+    {
+        return $this->drink_id;
     }
 
     /**
@@ -349,26 +356,6 @@ abstract class Review implements ActiveRecordInterface
     {
         return $this->post_id;
     }
-
-    /**
-     * Set the value of [id] column.
-     *
-     * @param int $v new value
-     * @return $this|\Review The current object (for fluent API support)
-     */
-    public function setId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[ReviewTableMap::COL_ID] = true;
-        }
-
-        return $this;
-    } // setId()
 
     /**
      * Set the value of [rating] column.
@@ -389,6 +376,30 @@ abstract class Review implements ActiveRecordInterface
 
         return $this;
     } // setRating()
+
+    /**
+     * Set the value of [drink_id] column.
+     *
+     * @param int $v new value
+     * @return $this|\Review The current object (for fluent API support)
+     */
+    public function setDrinkId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->drink_id !== $v) {
+            $this->drink_id = $v;
+            $this->modifiedColumns[ReviewTableMap::COL_DRINK_ID] = true;
+        }
+
+        if ($this->aDrink !== null && $this->aDrink->getId() !== $v) {
+            $this->aDrink = null;
+        }
+
+        return $this;
+    } // setDrinkId()
 
     /**
      * Set the value of [post_id] column.
@@ -450,11 +461,11 @@ abstract class Review implements ActiveRecordInterface
     {
         try {
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ReviewTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ReviewTableMap::translateFieldName('Rating', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ReviewTableMap::translateFieldName('Rating', TableMap::TYPE_PHPNAME, $indexType)];
             $this->rating = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ReviewTableMap::translateFieldName('DrinkId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->drink_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ReviewTableMap::translateFieldName('PostId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->post_id = (null !== $col) ? (int) $col : null;
@@ -488,6 +499,9 @@ abstract class Review implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aDrink !== null && $this->drink_id !== $this->aDrink->getId()) {
+            $this->aDrink = null;
+        }
         if ($this->aPost !== null && $this->post_id !== $this->aPost->getId()) {
             $this->aPost = null;
         }
@@ -531,6 +545,7 @@ abstract class Review implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aPost = null;
+            $this->aDrink = null;
         } // if (deep)
     }
 
@@ -646,6 +661,13 @@ abstract class Review implements ActiveRecordInterface
                 $this->setPost($this->aPost);
             }
 
+            if ($this->aDrink !== null) {
+                if ($this->aDrink->isModified() || $this->aDrink->isNew()) {
+                    $affectedRows += $this->aDrink->save($con);
+                }
+                $this->setDrink($this->aDrink);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -677,17 +699,13 @@ abstract class Review implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[ReviewTableMap::COL_ID] = true;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ReviewTableMap::COL_ID . ')');
-        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ReviewTableMap::COL_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'id';
-        }
         if ($this->isColumnModified(ReviewTableMap::COL_RATING)) {
             $modifiedColumns[':p' . $index++]  = 'rating';
+        }
+        if ($this->isColumnModified(ReviewTableMap::COL_DRINK_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'drink_id';
         }
         if ($this->isColumnModified(ReviewTableMap::COL_POST_ID)) {
             $modifiedColumns[':p' . $index++]  = 'post_id';
@@ -703,11 +721,11 @@ abstract class Review implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'id':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
                     case 'rating':
                         $stmt->bindValue($identifier, $this->rating, PDO::PARAM_STR);
+                        break;
+                    case 'drink_id':
+                        $stmt->bindValue($identifier, $this->drink_id, PDO::PARAM_INT);
                         break;
                     case 'post_id':
                         $stmt->bindValue($identifier, $this->post_id, PDO::PARAM_INT);
@@ -719,13 +737,6 @@ abstract class Review implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
-
-        try {
-            $pk = $con->lastInsertId();
-        } catch (Exception $e) {
-            throw new PropelException('Unable to get autoincrement id.', 0, $e);
-        }
-        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -775,10 +786,10 @@ abstract class Review implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
+                return $this->getRating();
                 break;
             case 1:
-                return $this->getRating();
+                return $this->getDrinkId();
                 break;
             case 2:
                 return $this->getPostId();
@@ -813,8 +824,8 @@ abstract class Review implements ActiveRecordInterface
         $alreadyDumpedObjects['Review'][$this->hashCode()] = true;
         $keys = ReviewTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getRating(),
+            $keys[0] => $this->getRating(),
+            $keys[1] => $this->getDrinkId(),
             $keys[2] => $this->getPostId(),
         );
         $virtualColumns = $this->virtualColumns;
@@ -837,6 +848,21 @@ abstract class Review implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->aPost->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aDrink) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'drink';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'drink';
+                        break;
+                    default:
+                        $key = 'Drink';
+                }
+
+                $result[$key] = $this->aDrink->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -873,10 +899,10 @@ abstract class Review implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
+                $this->setRating($value);
                 break;
             case 1:
-                $this->setRating($value);
+                $this->setDrinkId($value);
                 break;
             case 2:
                 $this->setPostId($value);
@@ -908,10 +934,10 @@ abstract class Review implements ActiveRecordInterface
         $keys = ReviewTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) {
-            $this->setId($arr[$keys[0]]);
+            $this->setRating($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setRating($arr[$keys[1]]);
+            $this->setDrinkId($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
             $this->setPostId($arr[$keys[2]]);
@@ -957,11 +983,11 @@ abstract class Review implements ActiveRecordInterface
     {
         $criteria = new Criteria(ReviewTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(ReviewTableMap::COL_ID)) {
-            $criteria->add(ReviewTableMap::COL_ID, $this->id);
-        }
         if ($this->isColumnModified(ReviewTableMap::COL_RATING)) {
             $criteria->add(ReviewTableMap::COL_RATING, $this->rating);
+        }
+        if ($this->isColumnModified(ReviewTableMap::COL_DRINK_ID)) {
+            $criteria->add(ReviewTableMap::COL_DRINK_ID, $this->drink_id);
         }
         if ($this->isColumnModified(ReviewTableMap::COL_POST_ID)) {
             $criteria->add(ReviewTableMap::COL_POST_ID, $this->post_id);
@@ -983,7 +1009,6 @@ abstract class Review implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = ChildReviewQuery::create();
-        $criteria->add(ReviewTableMap::COL_ID, $this->id);
         $criteria->add(ReviewTableMap::COL_POST_ID, $this->post_id);
 
         return $criteria;
@@ -997,8 +1022,7 @@ abstract class Review implements ActiveRecordInterface
      */
     public function hashCode()
     {
-        $validPk = null !== $this->getId() &&
-            null !== $this->getPostId();
+        $validPk = null !== $this->getPostId();
 
         $validPrimaryKeyFKs = 1;
         $primaryKeyFKs = [];
@@ -1020,29 +1044,23 @@ abstract class Review implements ActiveRecordInterface
     }
 
     /**
-     * Returns the composite primary key for this object.
-     * The array elements will be in same order as specified in XML.
-     * @return array
+     * Returns the primary key for this object (row).
+     * @return int
      */
     public function getPrimaryKey()
     {
-        $pks = array();
-        $pks[0] = $this->getId();
-        $pks[1] = $this->getPostId();
-
-        return $pks;
+        return $this->getPostId();
     }
 
     /**
-     * Set the [composite] primary key.
+     * Generic method to set the primary key (post_id column).
      *
-     * @param      array $keys The elements of the composite key (order must match the order in XML file).
+     * @param       int $key Primary key.
      * @return void
      */
-    public function setPrimaryKey($keys)
+    public function setPrimaryKey($key)
     {
-        $this->setId($keys[0]);
-        $this->setPostId($keys[1]);
+        $this->setPostId($key);
     }
 
     /**
@@ -1051,7 +1069,7 @@ abstract class Review implements ActiveRecordInterface
      */
     public function isPrimaryKeyNull()
     {
-        return (null === $this->getId()) && (null === $this->getPostId());
+        return null === $this->getPostId();
     }
 
     /**
@@ -1068,10 +1086,10 @@ abstract class Review implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setRating($this->getRating());
+        $copyObj->setDrinkId($this->getDrinkId());
         $copyObj->setPostId($this->getPostId());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1114,10 +1132,9 @@ abstract class Review implements ActiveRecordInterface
 
         $this->aPost = $v;
 
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildPost object, it will not be re-added.
+        // Add binding for other direction of this 1:1 relationship.
         if ($v !== null) {
-            $v->addReview($this);
+            $v->setReview($this);
         }
 
 
@@ -1136,16 +1153,62 @@ abstract class Review implements ActiveRecordInterface
     {
         if ($this->aPost === null && ($this->post_id != 0)) {
             $this->aPost = ChildPostQuery::create()->findPk($this->post_id, $con);
+            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
+            $this->aPost->setReview($this);
+        }
+
+        return $this->aPost;
+    }
+
+    /**
+     * Declares an association between this object and a ChildDrink object.
+     *
+     * @param  ChildDrink $v
+     * @return $this|\Review The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setDrink(ChildDrink $v = null)
+    {
+        if ($v === null) {
+            $this->setDrinkId(NULL);
+        } else {
+            $this->setDrinkId($v->getId());
+        }
+
+        $this->aDrink = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildDrink object, it will not be re-added.
+        if ($v !== null) {
+            $v->addReview($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildDrink object
+     *
+     * @param  ConnectionInterface $con Optional Connection object.
+     * @return ChildDrink The associated ChildDrink object.
+     * @throws PropelException
+     */
+    public function getDrink(ConnectionInterface $con = null)
+    {
+        if ($this->aDrink === null && ($this->drink_id != 0)) {
+            $this->aDrink = ChildDrinkQuery::create()->findPk($this->drink_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aPost->addReviews($this);
+                $this->aDrink->addReviews($this);
              */
         }
 
-        return $this->aPost;
+        return $this->aDrink;
     }
 
     /**
@@ -1158,8 +1221,11 @@ abstract class Review implements ActiveRecordInterface
         if (null !== $this->aPost) {
             $this->aPost->removeReview($this);
         }
-        $this->id = null;
+        if (null !== $this->aDrink) {
+            $this->aDrink->removeReview($this);
+        }
         $this->rating = null;
+        $this->drink_id = null;
         $this->post_id = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
@@ -1182,6 +1248,7 @@ abstract class Review implements ActiveRecordInterface
         } // if ($deep)
 
         $this->aPost = null;
+        $this->aDrink = null;
     }
 
     /**

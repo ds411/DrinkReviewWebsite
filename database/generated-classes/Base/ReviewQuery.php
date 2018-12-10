@@ -20,12 +20,12 @@ use Propel\Runtime\Exception\PropelException;
  *
  *
  *
- * @method     ChildReviewQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildReviewQuery orderByRating($order = Criteria::ASC) Order by the rating column
+ * @method     ChildReviewQuery orderByDrinkId($order = Criteria::ASC) Order by the drink_id column
  * @method     ChildReviewQuery orderByPostId($order = Criteria::ASC) Order by the post_id column
  *
- * @method     ChildReviewQuery groupById() Group by the id column
  * @method     ChildReviewQuery groupByRating() Group by the rating column
+ * @method     ChildReviewQuery groupByDrinkId() Group by the drink_id column
  * @method     ChildReviewQuery groupByPostId() Group by the post_id column
  *
  * @method     ChildReviewQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
@@ -46,25 +46,35 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildReviewQuery rightJoinWithPost() Adds a RIGHT JOIN clause and with to the query using the Post relation
  * @method     ChildReviewQuery innerJoinWithPost() Adds a INNER JOIN clause and with to the query using the Post relation
  *
- * @method     \PostQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     ChildReviewQuery leftJoinDrink($relationAlias = null) Adds a LEFT JOIN clause to the query using the Drink relation
+ * @method     ChildReviewQuery rightJoinDrink($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Drink relation
+ * @method     ChildReviewQuery innerJoinDrink($relationAlias = null) Adds a INNER JOIN clause to the query using the Drink relation
+ *
+ * @method     ChildReviewQuery joinWithDrink($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Drink relation
+ *
+ * @method     ChildReviewQuery leftJoinWithDrink() Adds a LEFT JOIN clause and with to the query using the Drink relation
+ * @method     ChildReviewQuery rightJoinWithDrink() Adds a RIGHT JOIN clause and with to the query using the Drink relation
+ * @method     ChildReviewQuery innerJoinWithDrink() Adds a INNER JOIN clause and with to the query using the Drink relation
+ *
+ * @method     \PostQuery|\DrinkQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildReview findOne(ConnectionInterface $con = null) Return the first ChildReview matching the query
  * @method     ChildReview findOneOrCreate(ConnectionInterface $con = null) Return the first ChildReview matching the query, or a new ChildReview object populated from the query conditions when no match is found
  *
- * @method     ChildReview findOneById(int $id) Return the first ChildReview filtered by the id column
  * @method     ChildReview findOneByRating(string $rating) Return the first ChildReview filtered by the rating column
+ * @method     ChildReview findOneByDrinkId(int $drink_id) Return the first ChildReview filtered by the drink_id column
  * @method     ChildReview findOneByPostId(int $post_id) Return the first ChildReview filtered by the post_id column *
 
  * @method     ChildReview requirePk($key, ConnectionInterface $con = null) Return the ChildReview by primary key and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildReview requireOne(ConnectionInterface $con = null) Return the first ChildReview matching the query and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
- * @method     ChildReview requireOneById(int $id) Return the first ChildReview filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildReview requireOneByRating(string $rating) Return the first ChildReview filtered by the rating column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildReview requireOneByDrinkId(int $drink_id) Return the first ChildReview filtered by the drink_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildReview requireOneByPostId(int $post_id) Return the first ChildReview filtered by the post_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildReview[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildReview objects based on current ModelCriteria
- * @method     ChildReview[]|ObjectCollection findById(int $id) Return ChildReview objects filtered by the id column
  * @method     ChildReview[]|ObjectCollection findByRating(string $rating) Return ChildReview objects filtered by the rating column
+ * @method     ChildReview[]|ObjectCollection findByDrinkId(int $drink_id) Return ChildReview objects filtered by the drink_id column
  * @method     ChildReview[]|ObjectCollection findByPostId(int $post_id) Return ChildReview objects filtered by the post_id column
  * @method     ChildReview[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
  *
@@ -115,10 +125,10 @@ abstract class ReviewQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj = $c->findPk(array(12, 34), $con);
+     * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param array[$id, $post_id] $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildReview|array|mixed the result, formatted by the current formatter
@@ -143,7 +153,7 @@ abstract class ReviewQuery extends ModelCriteria
             return $this->findPkComplex($key, $con);
         }
 
-        if ((null !== ($obj = ReviewTableMap::getInstanceFromPool(serialize([(null === $key[0] || is_scalar($key[0]) || is_callable([$key[0], '__toString']) ? (string) $key[0] : $key[0]), (null === $key[1] || is_scalar($key[1]) || is_callable([$key[1], '__toString']) ? (string) $key[1] : $key[1])]))))) {
+        if ((null !== ($obj = ReviewTableMap::getInstanceFromPool(null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key)))) {
             // the object is already in the instance pool
             return $obj;
         }
@@ -164,11 +174,10 @@ abstract class ReviewQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, rating, post_id FROM review WHERE id = :p0 AND post_id = :p1';
+        $sql = 'SELECT rating, drink_id, post_id FROM review WHERE post_id = :p0';
         try {
             $stmt = $con->prepare($sql);
-            $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
-            $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
+            $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -179,7 +188,7 @@ abstract class ReviewQuery extends ModelCriteria
             /** @var ChildReview $obj */
             $obj = new ChildReview();
             $obj->hydrate($row);
-            ReviewTableMap::addInstanceToPool($obj, serialize([(null === $key[0] || is_scalar($key[0]) || is_callable([$key[0], '__toString']) ? (string) $key[0] : $key[0]), (null === $key[1] || is_scalar($key[1]) || is_callable([$key[1], '__toString']) ? (string) $key[1] : $key[1])]));
+            ReviewTableMap::addInstanceToPool($obj, null === $key || is_scalar($key) || is_callable([$key, '__toString']) ? (string) $key : $key);
         }
         $stmt->closeCursor();
 
@@ -208,7 +217,7 @@ abstract class ReviewQuery extends ModelCriteria
     /**
      * Find objects by primary key
      * <code>
-     * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
+     * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
      * @param     array $keys Primary keys to use for the query
      * @param     ConnectionInterface $con an optional connection object
@@ -238,10 +247,8 @@ abstract class ReviewQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
-        $this->addUsingAlias(ReviewTableMap::COL_ID, $key[0], Criteria::EQUAL);
-        $this->addUsingAlias(ReviewTableMap::COL_POST_ID, $key[1], Criteria::EQUAL);
 
-        return $this;
+        return $this->addUsingAlias(ReviewTableMap::COL_POST_ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -253,58 +260,8 @@ abstract class ReviewQuery extends ModelCriteria
      */
     public function filterByPrimaryKeys($keys)
     {
-        if (empty($keys)) {
-            return $this->add(null, '1<>1', Criteria::CUSTOM);
-        }
-        foreach ($keys as $key) {
-            $cton0 = $this->getNewCriterion(ReviewTableMap::COL_ID, $key[0], Criteria::EQUAL);
-            $cton1 = $this->getNewCriterion(ReviewTableMap::COL_POST_ID, $key[1], Criteria::EQUAL);
-            $cton0->addAnd($cton1);
-            $this->addOr($cton0);
-        }
 
-        return $this;
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return $this|ChildReviewQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(ReviewTableMap::COL_ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(ReviewTableMap::COL_ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ReviewTableMap::COL_ID, $id, $comparison);
+        return $this->addUsingAlias(ReviewTableMap::COL_POST_ID, $keys, Criteria::IN);
     }
 
     /**
@@ -346,6 +303,49 @@ abstract class ReviewQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ReviewTableMap::COL_RATING, $rating, $comparison);
+    }
+
+    /**
+     * Filter the query on the drink_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDrinkId(1234); // WHERE drink_id = 1234
+     * $query->filterByDrinkId(array(12, 34)); // WHERE drink_id IN (12, 34)
+     * $query->filterByDrinkId(array('min' => 12)); // WHERE drink_id > 12
+     * </code>
+     *
+     * @see       filterByDrink()
+     *
+     * @param     mixed $drinkId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildReviewQuery The current query, for fluid interface
+     */
+    public function filterByDrinkId($drinkId = null, $comparison = null)
+    {
+        if (is_array($drinkId)) {
+            $useMinMax = false;
+            if (isset($drinkId['min'])) {
+                $this->addUsingAlias(ReviewTableMap::COL_DRINK_ID, $drinkId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($drinkId['max'])) {
+                $this->addUsingAlias(ReviewTableMap::COL_DRINK_ID, $drinkId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ReviewTableMap::COL_DRINK_ID, $drinkId, $comparison);
     }
 
     /**
@@ -469,6 +469,83 @@ abstract class ReviewQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related \Drink object
+     *
+     * @param \Drink|ObjectCollection $drink The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @throws \Propel\Runtime\Exception\PropelException
+     *
+     * @return ChildReviewQuery The current query, for fluid interface
+     */
+    public function filterByDrink($drink, $comparison = null)
+    {
+        if ($drink instanceof \Drink) {
+            return $this
+                ->addUsingAlias(ReviewTableMap::COL_DRINK_ID, $drink->getId(), $comparison);
+        } elseif ($drink instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(ReviewTableMap::COL_DRINK_ID, $drink->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByDrink() only accepts arguments of type \Drink or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Drink relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildReviewQuery The current query, for fluid interface
+     */
+    public function joinDrink($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Drink');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Drink');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Drink relation Drink object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \DrinkQuery A secondary query class using the current class as primary query
+     */
+    public function useDrinkQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinDrink($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Drink', '\DrinkQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   ChildReview $review Object to remove from the list of results
@@ -478,9 +555,7 @@ abstract class ReviewQuery extends ModelCriteria
     public function prune($review = null)
     {
         if ($review) {
-            $this->addCond('pruneCond0', $this->getAliasedColName(ReviewTableMap::COL_ID), $review->getId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond1', $this->getAliasedColName(ReviewTableMap::COL_POST_ID), $review->getPostId(), Criteria::NOT_EQUAL);
-            $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
+            $this->addUsingAlias(ReviewTableMap::COL_POST_ID, $review->getPostId(), Criteria::NOT_EQUAL);
         }
 
         return $this;

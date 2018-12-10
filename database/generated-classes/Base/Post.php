@@ -2,7 +2,6 @@
 
 namespace Base;
 
-use \Post as ChildPost;
 use \PostQuery as ChildPostQuery;
 use \Review as ChildReview;
 use \ReviewQuery as ChildReviewQuery;
@@ -12,13 +11,11 @@ use \DateTime;
 use \Exception;
 use \PDO;
 use Map\PostTableMap;
-use Map\ReviewTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\LogicException;
@@ -102,10 +99,9 @@ abstract class Post implements ActiveRecordInterface
     protected $aUser;
 
     /**
-     * @var        ObjectCollection|ChildReview[] Collection to store aggregation of ChildReview objects.
+     * @var        ChildReview one-to-one related ChildReview object
      */
-    protected $collReviews;
-    protected $collReviewsPartial;
+    protected $singleReview;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -114,12 +110,6 @@ abstract class Post implements ActiveRecordInterface
      * @var boolean
      */
     protected $alreadyInSave = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection|ChildReview[]
-     */
-    protected $reviewsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Base\Post object.
@@ -600,7 +590,7 @@ abstract class Post implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aUser = null;
-            $this->collReviews = null;
+            $this->singleReview = null;
 
         } // if (deep)
     }
@@ -728,20 +718,9 @@ abstract class Post implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->reviewsScheduledForDeletion !== null) {
-                if (!$this->reviewsScheduledForDeletion->isEmpty()) {
-                    \ReviewQuery::create()
-                        ->filterByPrimaryKeys($this->reviewsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->reviewsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collReviews !== null) {
-                foreach ($this->collReviews as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
+            if ($this->singleReview !== null) {
+                if (!$this->singleReview->isDeleted() && ($this->singleReview->isNew() || $this->singleReview->isModified())) {
+                    $affectedRows += $this->singleReview->save($con);
                 }
             }
 
@@ -940,20 +919,20 @@ abstract class Post implements ActiveRecordInterface
 
                 $result[$key] = $this->aUser->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collReviews) {
+            if (null !== $this->singleReview) {
 
                 switch ($keyType) {
                     case TableMap::TYPE_CAMELNAME:
-                        $key = 'reviews';
+                        $key = 'review';
                         break;
                     case TableMap::TYPE_FIELDNAME:
-                        $key = 'reviews';
+                        $key = 'review';
                         break;
                     default:
-                        $key = 'Reviews';
+                        $key = 'Review';
                 }
 
-                $result[$key] = $this->collReviews->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+                $result[$key] = $this->singleReview->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
             }
         }
 
@@ -1187,10 +1166,9 @@ abstract class Post implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getReviews() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addReview($relObj->copy($deepCopy));
-                }
+            $relObj = $this->getReview();
+            if ($relObj) {
+                $copyObj->setReview($relObj->copy($deepCopy));
             }
 
         } // if ($deepCopy)
@@ -1285,235 +1263,39 @@ abstract class Post implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('Review' == $relationName) {
-            $this->initReviews();
-            return;
-        }
     }
 
     /**
-     * Clears out the collReviews collection
+     * Gets a single ChildReview object, which is related to this object by a one-to-one relationship.
      *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addReviews()
-     */
-    public function clearReviews()
-    {
-        $this->collReviews = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collReviews collection loaded partially.
-     */
-    public function resetPartialReviews($v = true)
-    {
-        $this->collReviewsPartial = $v;
-    }
-
-    /**
-     * Initializes the collReviews collection.
-     *
-     * By default this just sets the collReviews collection to an empty array (like clearcollReviews());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initReviews($overrideExisting = true)
-    {
-        if (null !== $this->collReviews && !$overrideExisting) {
-            return;
-        }
-
-        $collectionClassName = ReviewTableMap::getTableMap()->getCollectionClassName();
-
-        $this->collReviews = new $collectionClassName;
-        $this->collReviews->setModel('\Review');
-    }
-
-    /**
-     * Gets an array of ChildReview objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildPost is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return ObjectCollection|ChildReview[] List of ChildReview objects
+     * @param  ConnectionInterface $con optional connection object
+     * @return ChildReview
      * @throws PropelException
      */
-    public function getReviews(Criteria $criteria = null, ConnectionInterface $con = null)
+    public function getReview(ConnectionInterface $con = null)
     {
-        $partial = $this->collReviewsPartial && !$this->isNew();
-        if (null === $this->collReviews || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collReviews) {
-                // return empty collection
-                $this->initReviews();
-            } else {
-                $collReviews = ChildReviewQuery::create(null, $criteria)
-                    ->filterByPost($this)
-                    ->find($con);
 
-                if (null !== $criteria) {
-                    if (false !== $this->collReviewsPartial && count($collReviews)) {
-                        $this->initReviews(false);
-
-                        foreach ($collReviews as $obj) {
-                            if (false == $this->collReviews->contains($obj)) {
-                                $this->collReviews->append($obj);
-                            }
-                        }
-
-                        $this->collReviewsPartial = true;
-                    }
-
-                    return $collReviews;
-                }
-
-                if ($partial && $this->collReviews) {
-                    foreach ($this->collReviews as $obj) {
-                        if ($obj->isNew()) {
-                            $collReviews[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collReviews = $collReviews;
-                $this->collReviewsPartial = false;
-            }
+        if ($this->singleReview === null && !$this->isNew()) {
+            $this->singleReview = ChildReviewQuery::create()->findPk($this->getPrimaryKey(), $con);
         }
 
-        return $this->collReviews;
+        return $this->singleReview;
     }
 
     /**
-     * Sets a collection of ChildReview objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
+     * Sets a single ChildReview object as related to this object by a one-to-one relationship.
      *
-     * @param      Collection $reviews A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return $this|ChildPost The current object (for fluent API support)
-     */
-    public function setReviews(Collection $reviews, ConnectionInterface $con = null)
-    {
-        /** @var ChildReview[] $reviewsToDelete */
-        $reviewsToDelete = $this->getReviews(new Criteria(), $con)->diff($reviews);
-
-
-        //since at least one column in the foreign key is at the same time a PK
-        //we can not just set a PK to NULL in the lines below. We have to store
-        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
-        $this->reviewsScheduledForDeletion = clone $reviewsToDelete;
-
-        foreach ($reviewsToDelete as $reviewRemoved) {
-            $reviewRemoved->setPost(null);
-        }
-
-        $this->collReviews = null;
-        foreach ($reviews as $review) {
-            $this->addReview($review);
-        }
-
-        $this->collReviews = $reviews;
-        $this->collReviewsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Review objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Review objects.
-     * @throws PropelException
-     */
-    public function countReviews(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collReviewsPartial && !$this->isNew();
-        if (null === $this->collReviews || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collReviews) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getReviews());
-            }
-
-            $query = ChildReviewQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByPost($this)
-                ->count($con);
-        }
-
-        return count($this->collReviews);
-    }
-
-    /**
-     * Method called to associate a ChildReview object to this object
-     * through the ChildReview foreign key attribute.
-     *
-     * @param  ChildReview $l ChildReview
+     * @param  ChildReview $v ChildReview
      * @return $this|\Post The current object (for fluent API support)
+     * @throws PropelException
      */
-    public function addReview(ChildReview $l)
+    public function setReview(ChildReview $v = null)
     {
-        if ($this->collReviews === null) {
-            $this->initReviews();
-            $this->collReviewsPartial = true;
-        }
+        $this->singleReview = $v;
 
-        if (!$this->collReviews->contains($l)) {
-            $this->doAddReview($l);
-
-            if ($this->reviewsScheduledForDeletion and $this->reviewsScheduledForDeletion->contains($l)) {
-                $this->reviewsScheduledForDeletion->remove($this->reviewsScheduledForDeletion->search($l));
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ChildReview $review The ChildReview object to add.
-     */
-    protected function doAddReview(ChildReview $review)
-    {
-        $this->collReviews[]= $review;
-        $review->setPost($this);
-    }
-
-    /**
-     * @param  ChildReview $review The ChildReview object to remove.
-     * @return $this|ChildPost The current object (for fluent API support)
-     */
-    public function removeReview(ChildReview $review)
-    {
-        if ($this->getReviews()->contains($review)) {
-            $pos = $this->collReviews->search($review);
-            $this->collReviews->remove($pos);
-            if (null === $this->reviewsScheduledForDeletion) {
-                $this->reviewsScheduledForDeletion = clone $this->collReviews;
-                $this->reviewsScheduledForDeletion->clear();
-            }
-            $this->reviewsScheduledForDeletion[]= clone $review;
-            $review->setPost(null);
+        // Make sure that that the passed-in ChildReview isn't already associated with this object
+        if ($v !== null && $v->getPost(null, false) === null) {
+            $v->setPost($this);
         }
 
         return $this;
@@ -1551,14 +1333,12 @@ abstract class Post implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collReviews) {
-                foreach ($this->collReviews as $o) {
-                    $o->clearAllReferences($deep);
-                }
+            if ($this->singleReview) {
+                $this->singleReview->clearAllReferences($deep);
             }
         } // if ($deep)
 
-        $this->collReviews = null;
+        $this->singleReview = null;
         $this->aUser = null;
     }
 

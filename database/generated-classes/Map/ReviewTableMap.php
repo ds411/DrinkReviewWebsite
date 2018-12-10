@@ -72,14 +72,14 @@ class ReviewTableMap extends TableMap
     const NUM_HYDRATE_COLUMNS = 3;
 
     /**
-     * the column name for the id field
-     */
-    const COL_ID = 'review.id';
-
-    /**
      * the column name for the rating field
      */
     const COL_RATING = 'review.rating';
+
+    /**
+     * the column name for the drink_id field
+     */
+    const COL_DRINK_ID = 'review.drink_id';
 
     /**
      * the column name for the post_id field
@@ -98,10 +98,10 @@ class ReviewTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Rating', 'PostId', ),
-        self::TYPE_CAMELNAME     => array('id', 'rating', 'postId', ),
-        self::TYPE_COLNAME       => array(ReviewTableMap::COL_ID, ReviewTableMap::COL_RATING, ReviewTableMap::COL_POST_ID, ),
-        self::TYPE_FIELDNAME     => array('id', 'rating', 'post_id', ),
+        self::TYPE_PHPNAME       => array('Rating', 'DrinkId', 'PostId', ),
+        self::TYPE_CAMELNAME     => array('rating', 'drinkId', 'postId', ),
+        self::TYPE_COLNAME       => array(ReviewTableMap::COL_RATING, ReviewTableMap::COL_DRINK_ID, ReviewTableMap::COL_POST_ID, ),
+        self::TYPE_FIELDNAME     => array('rating', 'drink_id', 'post_id', ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -112,10 +112,10 @@ class ReviewTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Rating' => 1, 'PostId' => 2, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'rating' => 1, 'postId' => 2, ),
-        self::TYPE_COLNAME       => array(ReviewTableMap::COL_ID => 0, ReviewTableMap::COL_RATING => 1, ReviewTableMap::COL_POST_ID => 2, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'rating' => 1, 'post_id' => 2, ),
+        self::TYPE_PHPNAME       => array('Rating' => 0, 'DrinkId' => 1, 'PostId' => 2, ),
+        self::TYPE_CAMELNAME     => array('rating' => 0, 'drinkId' => 1, 'postId' => 2, ),
+        self::TYPE_COLNAME       => array(ReviewTableMap::COL_RATING => 0, ReviewTableMap::COL_DRINK_ID => 1, ReviewTableMap::COL_POST_ID => 2, ),
+        self::TYPE_FIELDNAME     => array('rating' => 0, 'drink_id' => 1, 'post_id' => 2, ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -134,10 +134,10 @@ class ReviewTableMap extends TableMap
         $this->setIdentifierQuoting(false);
         $this->setClassName('\\Review');
         $this->setPackage('');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('rating', 'Rating', 'DECIMAL', true, null, null);
+        $this->addForeignKey('drink_id', 'DrinkId', 'INTEGER', 'drink', 'id', true, null, null);
         $this->addForeignPrimaryKey('post_id', 'PostId', 'INTEGER' , 'post', 'id', true, null, null);
     } // initialize()
 
@@ -153,60 +153,14 @@ class ReviewTableMap extends TableMap
     1 => ':id',
   ),
 ), 'CASCADE', null, null, false);
+        $this->addRelation('Drink', '\\Drink', RelationMap::MANY_TO_ONE, array (
+  0 =>
+  array (
+    0 => ':drink_id',
+    1 => ':id',
+  ),
+), 'CASCADE', null, null, false);
     } // buildRelations()
-
-    /**
-     * Adds an object to the instance pool.
-     *
-     * Propel keeps cached copies of objects in an instance pool when they are retrieved
-     * from the database. In some cases you may need to explicitly add objects
-     * to the cache in order to ensure that the same objects are always returned by find*()
-     * and findPk*() calls.
-     *
-     * @param \Review $obj A \Review object.
-     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
-     */
-    public static function addInstanceToPool($obj, $key = null)
-    {
-        if (Propel::isInstancePoolingEnabled()) {
-            if (null === $key) {
-                $key = serialize([(null === $obj->getId() || is_scalar($obj->getId()) || is_callable([$obj->getId(), '__toString']) ? (string) $obj->getId() : $obj->getId()), (null === $obj->getPostId() || is_scalar($obj->getPostId()) || is_callable([$obj->getPostId(), '__toString']) ? (string) $obj->getPostId() : $obj->getPostId())]);
-            } // if key === null
-            self::$instances[$key] = $obj;
-        }
-    }
-
-    /**
-     * Removes an object from the instance pool.
-     *
-     * Propel keeps cached copies of objects in an instance pool when they are retrieved
-     * from the database.  In some cases -- especially when you override doDelete
-     * methods in your stub classes -- you may need to explicitly remove objects
-     * from the cache in order to prevent returning objects that no longer exist.
-     *
-     * @param mixed $value A \Review object or a primary key value.
-     */
-    public static function removeInstanceFromPool($value)
-    {
-        if (Propel::isInstancePoolingEnabled() && null !== $value) {
-            if (is_object($value) && $value instanceof \Review) {
-                $key = serialize([(null === $value->getId() || is_scalar($value->getId()) || is_callable([$value->getId(), '__toString']) ? (string) $value->getId() : $value->getId()), (null === $value->getPostId() || is_scalar($value->getPostId()) || is_callable([$value->getPostId(), '__toString']) ? (string) $value->getPostId() : $value->getPostId())]);
-
-            } elseif (is_array($value) && count($value) === 2) {
-                // assume we've been passed a primary key";
-                $key = serialize([(null === $value[0] || is_scalar($value[0]) || is_callable([$value[0], '__toString']) ? (string) $value[0] : $value[0]), (null === $value[1] || is_scalar($value[1]) || is_callable([$value[1], '__toString']) ? (string) $value[1] : $value[1])]);
-            } elseif ($value instanceof Criteria) {
-                self::$instances = [];
-
-                return;
-            } else {
-                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Review object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
-                throw $e;
-            }
-
-            unset(self::$instances[$key]);
-        }
-    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -224,11 +178,11 @@ class ReviewTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('PostId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('PostId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize([(null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]), (null === $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('PostId', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('PostId', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('PostId', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('PostId', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('PostId', TableMap::TYPE_PHPNAME, $indexType)])]);
+        return null === $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('PostId', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('PostId', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('PostId', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('PostId', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('PostId', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -245,20 +199,11 @@ class ReviewTableMap extends TableMap
      */
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-            $pks = [];
-
-        $pks[] = (int) $row[
-            $indexType == TableMap::TYPE_NUM
-                ? 0 + $offset
-                : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-        ];
-        $pks[] = (int) $row[
+        return (int) $row[
             $indexType == TableMap::TYPE_NUM
                 ? 2 + $offset
                 : self::translateFieldName('PostId', TableMap::TYPE_PHPNAME, $indexType)
         ];
-
-        return $pks;
     }
 
     /**
@@ -358,12 +303,12 @@ class ReviewTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ReviewTableMap::COL_ID);
             $criteria->addSelectColumn(ReviewTableMap::COL_RATING);
+            $criteria->addSelectColumn(ReviewTableMap::COL_DRINK_ID);
             $criteria->addSelectColumn(ReviewTableMap::COL_POST_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.rating');
+            $criteria->addSelectColumn($alias . '.drink_id');
             $criteria->addSelectColumn($alias . '.post_id');
         }
     }
@@ -416,17 +361,7 @@ class ReviewTableMap extends TableMap
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(ReviewTableMap::DATABASE_NAME);
-            // primary key is composite; we therefore, expect
-            // the primary key passed to be an array of pkey values
-            if (count($values) == count($values, COUNT_RECURSIVE)) {
-                // array is not multi-dimensional
-                $values = array($values);
-            }
-            foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(ReviewTableMap::COL_ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(ReviewTableMap::COL_POST_ID, $value[1]));
-                $criteria->addOr($criterion);
-            }
+            $criteria->add(ReviewTableMap::COL_POST_ID, (array) $values, Criteria::IN);
         }
 
         $query = ReviewQuery::create()->mergeWith($criteria);
@@ -472,10 +407,6 @@ class ReviewTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from Review object
-        }
-
-        if ($criteria->containsKey(ReviewTableMap::COL_ID) && $criteria->keyContainsValue(ReviewTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ReviewTableMap::COL_ID.')');
         }
 
 

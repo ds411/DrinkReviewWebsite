@@ -6,6 +6,8 @@ use \Company as ChildCompany;
 use \CompanyQuery as ChildCompanyQuery;
 use \Drink as ChildDrink;
 use \DrinkQuery as ChildDrinkQuery;
+use \Review as ChildReview;
+use \ReviewQuery as ChildReviewQuery;
 use \Style as ChildStyle;
 use \StyleQuery as ChildStyleQuery;
 use \Wishlist as ChildWishlist;
@@ -13,6 +15,7 @@ use \WishlistQuery as ChildWishlistQuery;
 use \Exception;
 use \PDO;
 use Map\DrinkTableMap;
+use Map\ReviewTableMap;
 use Map\WishlistTableMap;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -114,6 +117,12 @@ abstract class Drink implements ActiveRecordInterface
     protected $aStyle;
 
     /**
+     * @var        ObjectCollection|ChildReview[] Collection to store aggregation of ChildReview objects.
+     */
+    protected $collReviews;
+    protected $collReviewsPartial;
+
+    /**
      * @var        ObjectCollection|ChildWishlist[] Collection to store aggregation of ChildWishlist objects.
      */
     protected $collWishlists;
@@ -126,6 +135,12 @@ abstract class Drink implements ActiveRecordInterface
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildReview[]
+     */
+    protected $reviewsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -652,6 +667,8 @@ abstract class Drink implements ActiveRecordInterface
 
             $this->aCompany = null;
             $this->aStyle = null;
+            $this->collReviews = null;
+
             $this->collWishlists = null;
 
         } // if (deep)
@@ -790,6 +807,23 @@ abstract class Drink implements ActiveRecordInterface
                 }
 
                 $this->resetModified();
+            }
+
+            if ($this->reviewsScheduledForDeletion !== null) {
+                if (!$this->reviewsScheduledForDeletion->isEmpty()) {
+                    \ReviewQuery::create()
+                        ->filterByPrimaryKeys($this->reviewsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->reviewsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collReviews !== null) {
+                foreach ($this->collReviews as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             if ($this->wishlistsScheduledForDeletion !== null) {
@@ -1027,6 +1061,21 @@ abstract class Drink implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->aStyle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collReviews) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'reviews';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'reviews';
+                        break;
+                    default:
+                        $key = 'Reviews';
+                }
+
+                $result[$key] = $this->collReviews->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collWishlists) {
 
@@ -1285,6 +1334,12 @@ abstract class Drink implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
+            foreach ($this->getReviews() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addReview($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getWishlists() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addWishlist($relObj->copy($deepCopy));
@@ -1434,10 +1489,264 @@ abstract class Drink implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
+        if ('Review' == $relationName) {
+            $this->initReviews();
+            return;
+        }
         if ('Wishlist' == $relationName) {
             $this->initWishlists();
             return;
         }
+    }
+
+    /**
+     * Clears out the collReviews collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addReviews()
+     */
+    public function clearReviews()
+    {
+        $this->collReviews = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collReviews collection loaded partially.
+     */
+    public function resetPartialReviews($v = true)
+    {
+        $this->collReviewsPartial = $v;
+    }
+
+    /**
+     * Initializes the collReviews collection.
+     *
+     * By default this just sets the collReviews collection to an empty array (like clearcollReviews());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initReviews($overrideExisting = true)
+    {
+        if (null !== $this->collReviews && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = ReviewTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collReviews = new $collectionClassName;
+        $this->collReviews->setModel('\Review');
+    }
+
+    /**
+     * Gets an array of ChildReview objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildDrink is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildReview[] List of ChildReview objects
+     * @throws PropelException
+     */
+    public function getReviews(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collReviewsPartial && !$this->isNew();
+        if (null === $this->collReviews || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collReviews) {
+                // return empty collection
+                $this->initReviews();
+            } else {
+                $collReviews = ChildReviewQuery::create(null, $criteria)
+                    ->filterByDrink($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collReviewsPartial && count($collReviews)) {
+                        $this->initReviews(false);
+
+                        foreach ($collReviews as $obj) {
+                            if (false == $this->collReviews->contains($obj)) {
+                                $this->collReviews->append($obj);
+                            }
+                        }
+
+                        $this->collReviewsPartial = true;
+                    }
+
+                    return $collReviews;
+                }
+
+                if ($partial && $this->collReviews) {
+                    foreach ($this->collReviews as $obj) {
+                        if ($obj->isNew()) {
+                            $collReviews[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collReviews = $collReviews;
+                $this->collReviewsPartial = false;
+            }
+        }
+
+        return $this->collReviews;
+    }
+
+    /**
+     * Sets a collection of ChildReview objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $reviews A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildDrink The current object (for fluent API support)
+     */
+    public function setReviews(Collection $reviews, ConnectionInterface $con = null)
+    {
+        /** @var ChildReview[] $reviewsToDelete */
+        $reviewsToDelete = $this->getReviews(new Criteria(), $con)->diff($reviews);
+
+
+        $this->reviewsScheduledForDeletion = $reviewsToDelete;
+
+        foreach ($reviewsToDelete as $reviewRemoved) {
+            $reviewRemoved->setDrink(null);
+        }
+
+        $this->collReviews = null;
+        foreach ($reviews as $review) {
+            $this->addReview($review);
+        }
+
+        $this->collReviews = $reviews;
+        $this->collReviewsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Review objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Review objects.
+     * @throws PropelException
+     */
+    public function countReviews(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collReviewsPartial && !$this->isNew();
+        if (null === $this->collReviews || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collReviews) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getReviews());
+            }
+
+            $query = ChildReviewQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByDrink($this)
+                ->count($con);
+        }
+
+        return count($this->collReviews);
+    }
+
+    /**
+     * Method called to associate a ChildReview object to this object
+     * through the ChildReview foreign key attribute.
+     *
+     * @param  ChildReview $l ChildReview
+     * @return $this|\Drink The current object (for fluent API support)
+     */
+    public function addReview(ChildReview $l)
+    {
+        if ($this->collReviews === null) {
+            $this->initReviews();
+            $this->collReviewsPartial = true;
+        }
+
+        if (!$this->collReviews->contains($l)) {
+            $this->doAddReview($l);
+
+            if ($this->reviewsScheduledForDeletion and $this->reviewsScheduledForDeletion->contains($l)) {
+                $this->reviewsScheduledForDeletion->remove($this->reviewsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildReview $review The ChildReview object to add.
+     */
+    protected function doAddReview(ChildReview $review)
+    {
+        $this->collReviews[]= $review;
+        $review->setDrink($this);
+    }
+
+    /**
+     * @param  ChildReview $review The ChildReview object to remove.
+     * @return $this|ChildDrink The current object (for fluent API support)
+     */
+    public function removeReview(ChildReview $review)
+    {
+        if ($this->getReviews()->contains($review)) {
+            $pos = $this->collReviews->search($review);
+            $this->collReviews->remove($pos);
+            if (null === $this->reviewsScheduledForDeletion) {
+                $this->reviewsScheduledForDeletion = clone $this->collReviews;
+                $this->reviewsScheduledForDeletion->clear();
+            }
+            $this->reviewsScheduledForDeletion[]= clone $review;
+            $review->setDrink(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Drink is new, it will return
+     * an empty collection; or if this Drink has previously
+     * been saved, it will retrieve related Reviews from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Drink.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildReview[] List of ChildReview objects
+     */
+    public function getReviewsJoinPost(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildReviewQuery::create(null, $criteria);
+        $query->joinWith('Post', $joinBehavior);
+
+        return $this->getReviews($query, $con);
     }
 
     /**
@@ -1726,6 +2035,11 @@ abstract class Drink implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collReviews) {
+                foreach ($this->collReviews as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collWishlists) {
                 foreach ($this->collWishlists as $o) {
                     $o->clearAllReferences($deep);
@@ -1733,6 +2047,7 @@ abstract class Drink implements ActiveRecordInterface
             }
         } // if ($deep)
 
+        $this->collReviews = null;
         $this->collWishlists = null;
         $this->aCompany = null;
         $this->aStyle = null;

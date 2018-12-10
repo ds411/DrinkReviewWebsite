@@ -43,11 +43,14 @@
 	<column name="creationTime" type="timestamp" required="true" />
   </table>
   <table name="review" phpName="Review">
-	<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 	<column name="rating" type="decimal" required="true" />
+	<column name="drink_id" type="integer" required="true" />
 	<column name="post_id" type="integer" required="true" primaryKey="true" />
 	<foreign-key foreignTable="post" onDelete="CASCADE">
 		<reference local="post_id" foreign="id" />
+	</foreign-key>
+	<foreign-key foreignTable="drink" onDelete="CASCADE">
+		<reference local="drink_id" foreign="id" />
 	</foreign-key>
   </table>
   <table name="friend" phpName="Friend">

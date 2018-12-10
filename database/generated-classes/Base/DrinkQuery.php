@@ -60,6 +60,16 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildDrinkQuery rightJoinWithStyle() Adds a RIGHT JOIN clause and with to the query using the Style relation
  * @method     ChildDrinkQuery innerJoinWithStyle() Adds a INNER JOIN clause and with to the query using the Style relation
  *
+ * @method     ChildDrinkQuery leftJoinReview($relationAlias = null) Adds a LEFT JOIN clause to the query using the Review relation
+ * @method     ChildDrinkQuery rightJoinReview($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Review relation
+ * @method     ChildDrinkQuery innerJoinReview($relationAlias = null) Adds a INNER JOIN clause to the query using the Review relation
+ *
+ * @method     ChildDrinkQuery joinWithReview($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Review relation
+ *
+ * @method     ChildDrinkQuery leftJoinWithReview() Adds a LEFT JOIN clause and with to the query using the Review relation
+ * @method     ChildDrinkQuery rightJoinWithReview() Adds a RIGHT JOIN clause and with to the query using the Review relation
+ * @method     ChildDrinkQuery innerJoinWithReview() Adds a INNER JOIN clause and with to the query using the Review relation
+ *
  * @method     ChildDrinkQuery leftJoinWishlist($relationAlias = null) Adds a LEFT JOIN clause to the query using the Wishlist relation
  * @method     ChildDrinkQuery rightJoinWishlist($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Wishlist relation
  * @method     ChildDrinkQuery innerJoinWishlist($relationAlias = null) Adds a INNER JOIN clause to the query using the Wishlist relation
@@ -70,7 +80,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildDrinkQuery rightJoinWithWishlist() Adds a RIGHT JOIN clause and with to the query using the Wishlist relation
  * @method     ChildDrinkQuery innerJoinWithWishlist() Adds a INNER JOIN clause and with to the query using the Wishlist relation
  *
- * @method     \CompanyQuery|\StyleQuery|\WishlistQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \CompanyQuery|\StyleQuery|\ReviewQuery|\WishlistQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildDrink findOne(ConnectionInterface $con = null) Return the first ChildDrink matching the query
  * @method     ChildDrink findOneOrCreate(ConnectionInterface $con = null) Return the first ChildDrink matching the query, or a new ChildDrink object populated from the query conditions when no match is found
@@ -584,6 +594,79 @@ abstract class DrinkQuery extends ModelCriteria
         return $this
             ->joinStyle($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Style', '\StyleQuery');
+    }
+
+    /**
+     * Filter the query by a related \Review object
+     *
+     * @param \Review|ObjectCollection $review the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildDrinkQuery The current query, for fluid interface
+     */
+    public function filterByReview($review, $comparison = null)
+    {
+        if ($review instanceof \Review) {
+            return $this
+                ->addUsingAlias(DrinkTableMap::COL_ID, $review->getDrinkId(), $comparison);
+        } elseif ($review instanceof ObjectCollection) {
+            return $this
+                ->useReviewQuery()
+                ->filterByPrimaryKeys($review->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByReview() only accepts arguments of type \Review or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Review relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildDrinkQuery The current query, for fluid interface
+     */
+    public function joinReview($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Review');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Review');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Review relation Review object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \ReviewQuery A secondary query class using the current class as primary query
+     */
+    public function useReviewQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinReview($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Review', '\ReviewQuery');
     }
 
     /**

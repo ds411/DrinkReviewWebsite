@@ -159,13 +159,13 @@ class PostTableMap extends TableMap
     1 => ':username',
   ),
 ), 'CASCADE', null, null, false);
-        $this->addRelation('Review', '\\Review', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Review', '\\Review', RelationMap::ONE_TO_ONE, array (
   0 =>
   array (
     0 => ':post_id',
     1 => ':id',
   ),
-), 'CASCADE', null, 'Reviews', false);
+), 'CASCADE', null, null, false);
     } // buildRelations()
     /**
      * Method to invalidate the instance pool of all tables related to post     * by a foreign key with ON DELETE CASCADE
