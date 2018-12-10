@@ -1,9 +1,15 @@
 .navbar {
-	padding-left: 20%;
-	padding-right: 20%;
+	padding-left: 10%;
+	padding-right: 10%;
 	-webkit-box-shadow: 0 8px 6px -6px gray;
 	   -moz-box-shadow: 0 8px 6px -6px gray;
 	        box-shadow: 0 8px 6px -6px gray;
+}
+.new-post-btn {
+	border-radius: 5px;
+	height: 4%;
+	margin: auto;
+	padding: 0 20px;
 }
 .login-page {
 	padding-top: 10%;
@@ -19,3 +25,4 @@
 	border-right: solid #343a40;
   	border-width: thin;
 }
+
