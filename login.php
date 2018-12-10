@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+require "vendor/autoload.php";
+require "database/generated-conf/config.php";
+require "sessionAuth.php";
+
 $user = UserQuery::create()->findPk($_POST['username']);
 
 if(!isset($_POST['username'], $_POST['password'])) {

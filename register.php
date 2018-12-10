@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+require "vendor/autoload.php";
+require "database/generated-conf/config.php";
+require "sessionAuth.php";
+
 if(!isset($_POST['name'], $_POST['username'], $_POST['password'], $_POST['confirmPassword'])) {
     echo "ERROR: Malformed form data.";
 }
@@ -20,7 +24,7 @@ else {
     $user = new User();
     $now = new DateTime();
     $user
-        ->setName($_POST['name'])
+        ->setRealName($_POST['name'])
         ->setUsername($_POST['username'])
         ->setPassword(password_hash($_POST['password'], PASSWORD_DEFAULT))
         ->setCreationtime($now)

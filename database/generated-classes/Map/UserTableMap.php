@@ -82,9 +82,9 @@ class UserTableMap extends TableMap
     const COL_PASSWORD = 'user.password';
 
     /**
-     * the column name for the name field
+     * the column name for the real_name field
      */
-    const COL_NAME = 'user.name';
+    const COL_REAL_NAME = 'user.real_name';
 
     /**
      * the column name for the permissions field
@@ -118,10 +118,10 @@ class UserTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Username', 'Password', 'Name', 'Permissions', 'Picture', 'Creationtime', 'Lastactivitytime', ),
-        self::TYPE_CAMELNAME     => array('username', 'password', 'name', 'permissions', 'picture', 'creationtime', 'lastactivitytime', ),
-        self::TYPE_COLNAME       => array(UserTableMap::COL_USERNAME, UserTableMap::COL_PASSWORD, UserTableMap::COL_NAME, UserTableMap::COL_PERMISSIONS, UserTableMap::COL_PICTURE, UserTableMap::COL_CREATIONTIME, UserTableMap::COL_LASTACTIVITYTIME, ),
-        self::TYPE_FIELDNAME     => array('username', 'password', 'name', 'permissions', 'picture', 'creationTime', 'lastActivityTime', ),
+        self::TYPE_PHPNAME       => array('Username', 'Password', 'RealName', 'Permissions', 'Picture', 'Creationtime', 'Lastactivitytime', ),
+        self::TYPE_CAMELNAME     => array('username', 'password', 'realName', 'permissions', 'picture', 'creationtime', 'lastactivitytime', ),
+        self::TYPE_COLNAME       => array(UserTableMap::COL_USERNAME, UserTableMap::COL_PASSWORD, UserTableMap::COL_REAL_NAME, UserTableMap::COL_PERMISSIONS, UserTableMap::COL_PICTURE, UserTableMap::COL_CREATIONTIME, UserTableMap::COL_LASTACTIVITYTIME, ),
+        self::TYPE_FIELDNAME     => array('username', 'password', 'real_name', 'permissions', 'picture', 'creationTime', 'lastActivityTime', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -132,10 +132,10 @@ class UserTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Username' => 0, 'Password' => 1, 'Name' => 2, 'Permissions' => 3, 'Picture' => 4, 'Creationtime' => 5, 'Lastactivitytime' => 6, ),
-        self::TYPE_CAMELNAME     => array('username' => 0, 'password' => 1, 'name' => 2, 'permissions' => 3, 'picture' => 4, 'creationtime' => 5, 'lastactivitytime' => 6, ),
-        self::TYPE_COLNAME       => array(UserTableMap::COL_USERNAME => 0, UserTableMap::COL_PASSWORD => 1, UserTableMap::COL_NAME => 2, UserTableMap::COL_PERMISSIONS => 3, UserTableMap::COL_PICTURE => 4, UserTableMap::COL_CREATIONTIME => 5, UserTableMap::COL_LASTACTIVITYTIME => 6, ),
-        self::TYPE_FIELDNAME     => array('username' => 0, 'password' => 1, 'name' => 2, 'permissions' => 3, 'picture' => 4, 'creationTime' => 5, 'lastActivityTime' => 6, ),
+        self::TYPE_PHPNAME       => array('Username' => 0, 'Password' => 1, 'RealName' => 2, 'Permissions' => 3, 'Picture' => 4, 'Creationtime' => 5, 'Lastactivitytime' => 6, ),
+        self::TYPE_CAMELNAME     => array('username' => 0, 'password' => 1, 'realName' => 2, 'permissions' => 3, 'picture' => 4, 'creationtime' => 5, 'lastactivitytime' => 6, ),
+        self::TYPE_COLNAME       => array(UserTableMap::COL_USERNAME => 0, UserTableMap::COL_PASSWORD => 1, UserTableMap::COL_REAL_NAME => 2, UserTableMap::COL_PERMISSIONS => 3, UserTableMap::COL_PICTURE => 4, UserTableMap::COL_CREATIONTIME => 5, UserTableMap::COL_LASTACTIVITYTIME => 6, ),
+        self::TYPE_FIELDNAME     => array('username' => 0, 'password' => 1, 'real_name' => 2, 'permissions' => 3, 'picture' => 4, 'creationTime' => 5, 'lastActivityTime' => 6, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -158,7 +158,7 @@ class UserTableMap extends TableMap
         // columns
         $this->addPrimaryKey('username', 'Username', 'VARCHAR', true, 24, null);
         $this->addColumn('password', 'Password', 'VARCHAR', true, 255, null);
-        $this->addColumn('name', 'Name', 'VARCHAR', true, 100, null);
+        $this->addColumn('real_name', 'RealName', 'VARCHAR', true, 100, null);
         $this->addColumn('permissions', 'Permissions', 'TINYINT', true, null, null);
         $this->addColumn('picture', 'Picture', 'BLOB', false, null, null);
         $this->addColumn('creationTime', 'Creationtime', 'TIMESTAMP', true, null, null);
@@ -354,7 +354,7 @@ class UserTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(UserTableMap::COL_USERNAME);
             $criteria->addSelectColumn(UserTableMap::COL_PASSWORD);
-            $criteria->addSelectColumn(UserTableMap::COL_NAME);
+            $criteria->addSelectColumn(UserTableMap::COL_REAL_NAME);
             $criteria->addSelectColumn(UserTableMap::COL_PERMISSIONS);
             $criteria->addSelectColumn(UserTableMap::COL_PICTURE);
             $criteria->addSelectColumn(UserTableMap::COL_CREATIONTIME);
@@ -362,7 +362,7 @@ class UserTableMap extends TableMap
         } else {
             $criteria->addSelectColumn($alias . '.username');
             $criteria->addSelectColumn($alias . '.password');
-            $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.real_name');
             $criteria->addSelectColumn($alias . '.permissions');
             $criteria->addSelectColumn($alias . '.picture');
             $criteria->addSelectColumn($alias . '.creationTime');
