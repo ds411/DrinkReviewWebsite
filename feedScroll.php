@@ -20,8 +20,6 @@ if(isset($_POST['page'])) {
         ->orderByCreationtime(Criteria::DESC)
         ->offset($offset)
         ->limit(10)
-        ->joinReview()
-        ->join('Review.Drink')
         ->find();
 
     if(empty($feedPosts)) {

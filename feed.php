@@ -58,8 +58,6 @@ $initialFeedPosts = PostQuery::create()
     ->filterByUsername($friends)
     ->orderByCreationtime(Criteria::DESC)
     ->limit(20)
-    ->joinReview()
-    ->join('Review.Drink')
     ->find();
 
 $initialFeed = "";
