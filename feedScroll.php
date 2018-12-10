@@ -17,6 +17,8 @@ if(isset($_POST['page'])) {
 
     $feedPosts = PostQuery::create()
         ->filterByUsername($friends)
+        ->_or()
+        ->filterByUsername($_SESSION['username'])
         ->orderByCreationtime(Criteria::DESC)
         ->offset($offset)
         ->limit(10)
@@ -30,7 +32,7 @@ if(isset($_POST['page'])) {
 
         foreach($feedPosts as $post) {
             $username = $post->getUsername();
-            $timestamp = $post->getCreationtime();
+            $timestamp = $post->getCreationtime()->format('Y-m-d H:i:s');
             $body = $post->getBody();
             $id = "";
             $drink = "";

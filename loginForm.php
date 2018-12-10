@@ -1,5 +1,11 @@
 <?php
 
+if(!isset($_SESSION)) session_start();
+
+require_once "vendor/autoload.php";
+require_once "database/generated-conf/config.php";
+require_once "sessionAuth.php";
+
 $title = "Register or Login";
 
 $content = <<<EOF

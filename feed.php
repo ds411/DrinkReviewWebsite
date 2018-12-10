@@ -1,5 +1,11 @@
 <?php
 
+if(!isset($_SESSION)) session_start();
+
+require_once "vendor/autoload.php";
+require_once "database/generated-conf/config.php";
+require_once "sessionAuth.php";
+
 use Propel\Runtime\ActiveQuery\Criteria;
 
 $title = "Your Feed";
@@ -47,6 +53,19 @@ $content = <<<EOF
             }
         }
     });
+    
+    $('#postBtn').click(function(event) {
+        $.post({
+            url:'createPost.php',
+            data:$('#postForm').serialize(),
+            success:function(data) {
+                console.log(data);
+                if(data.indexOf('<') !== -1) {
+                    $('#feed-post-container').prepend(data);
+                }
+            }
+        });
+    });
     </script>
 EOF;
 
@@ -56,6 +75,8 @@ $friends = FriendQuery::create()
 
 $initialFeedPosts = PostQuery::create()
     ->filterByUsername($friends)
+    ->_or()
+    ->filterByUsername($_SESSION['username'])
     ->orderByCreationtime(Criteria::DESC)
     ->limit(20)
     ->find();
@@ -64,7 +85,7 @@ $initialFeed = "";
 
 foreach($initialFeedPosts as $post) {
     $username = $post->getUsername();
-    $timestamp = $post->getCreationtime();
+    $timestamp = $post->getCreationtime()->format('Y-m-d H:i:s');
     $body = $post->getBody();
     $id = "";
     $drink = "";

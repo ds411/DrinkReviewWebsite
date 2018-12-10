@@ -56,8 +56,8 @@
 				        </button>
 				      </div>
 				      <div class="modal-body">
-				      	<form action='#' method='POST' id='postForm'>
-				        	<textarea maxlength='200' id='postArea' style='width:100%;height:150px;resize: none;'></textarea>
+				      	<form action='createPost.php' method='POST' id='postForm'>
+				        	<textarea maxlength='200' id='postArea' name="body" style='width:100%;height:150px;resize: none;'></textarea>
 				        </form>
 				      </div>
 				      <div class="modal-footer">
