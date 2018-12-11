@@ -16,6 +16,8 @@
 	background-color: #F8F8FF;
 	/*text-align: center; */
 }
+
+/* Feed */
 .feed-info {
 	padding-top: 1%;
 	background-color: #F8F8FF;
@@ -26,10 +28,10 @@
   	border-width: thin;
 }
 
+/* Profile */
 .profile-body {
 	background-color: #F8F8FF;
 	padding-top: 1%;
-	height: 200px;
 }
 .profile-post {
 	border-right: 1px solid #343a40;
@@ -55,8 +57,7 @@
 	height: 150px;
 	border: 1px solid black;;
 }
-
-input[type="file"] {
+input#profileImg-upload {
     display: none;
 }
 .custom-file-upload {
@@ -69,4 +70,25 @@ input[type="file"] {
 .imgUpload {
 	text-align: center;
 	padding-top: 2%;
+}
+
+/* Browse */
+.breadcrumbs {
+	background-color: #F8F8FF;
+	padding-top: 1%;
+
+}
+.browse-body {
+	background-color: #F8F8FF;
+	padding-top: 3%;
+	height: 200px;
+}
+.filter-info {
+	border-right: solid #343a40;
+  	border-width: thin;
+}
+
+.add-company, .add-drink {
+	background-color: #F8F8FF;
+	padding-top: 1%;
 }
