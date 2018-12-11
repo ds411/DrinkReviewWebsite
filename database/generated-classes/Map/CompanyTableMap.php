@@ -148,7 +148,7 @@ class CompanyTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'VARCHAR', true, 100, null);
-        $this->addColumn('picture', 'Picture', 'BLOB', false, null, null);
+        $this->addColumn('picture', 'Picture', 'VARCHAR', false, 200, null);
         $this->addColumn('location', 'Location', 'VARCHAR', false, 200, null);
         $this->addColumn('description', 'Description', 'LONGVARCHAR', false, null, null);
     } // initialize()

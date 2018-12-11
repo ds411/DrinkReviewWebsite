@@ -23,12 +23,14 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildDrinkQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildDrinkQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildDrinkQuery orderByPicture($order = Criteria::ASC) Order by the picture column
+ * @method     ChildDrinkQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method     ChildDrinkQuery orderByCompanyId($order = Criteria::ASC) Order by the company_id column
  * @method     ChildDrinkQuery orderByStyleName($order = Criteria::ASC) Order by the style_name column
  *
  * @method     ChildDrinkQuery groupById() Group by the id column
  * @method     ChildDrinkQuery groupByName() Group by the name column
  * @method     ChildDrinkQuery groupByPicture() Group by the picture column
+ * @method     ChildDrinkQuery groupByDescription() Group by the description column
  * @method     ChildDrinkQuery groupByCompanyId() Group by the company_id column
  * @method     ChildDrinkQuery groupByStyleName() Group by the style_name column
  *
@@ -87,7 +89,8 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildDrink findOneById(int $id) Return the first ChildDrink filtered by the id column
  * @method     ChildDrink findOneByName(string $name) Return the first ChildDrink filtered by the name column
- * @method     ChildDrink findOneByPicture(resource $picture) Return the first ChildDrink filtered by the picture column
+ * @method     ChildDrink findOneByPicture(string $picture) Return the first ChildDrink filtered by the picture column
+ * @method     ChildDrink findOneByDescription(string $description) Return the first ChildDrink filtered by the description column
  * @method     ChildDrink findOneByCompanyId(int $company_id) Return the first ChildDrink filtered by the company_id column
  * @method     ChildDrink findOneByStyleName(string $style_name) Return the first ChildDrink filtered by the style_name column *
 
@@ -96,14 +99,16 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildDrink requireOneById(int $id) Return the first ChildDrink filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildDrink requireOneByName(string $name) Return the first ChildDrink filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildDrink requireOneByPicture(resource $picture) Return the first ChildDrink filtered by the picture column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildDrink requireOneByPicture(string $picture) Return the first ChildDrink filtered by the picture column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildDrink requireOneByDescription(string $description) Return the first ChildDrink filtered by the description column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildDrink requireOneByCompanyId(int $company_id) Return the first ChildDrink filtered by the company_id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildDrink requireOneByStyleName(string $style_name) Return the first ChildDrink filtered by the style_name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildDrink[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildDrink objects based on current ModelCriteria
  * @method     ChildDrink[]|ObjectCollection findById(int $id) Return ChildDrink objects filtered by the id column
  * @method     ChildDrink[]|ObjectCollection findByName(string $name) Return ChildDrink objects filtered by the name column
- * @method     ChildDrink[]|ObjectCollection findByPicture(resource $picture) Return ChildDrink objects filtered by the picture column
+ * @method     ChildDrink[]|ObjectCollection findByPicture(string $picture) Return ChildDrink objects filtered by the picture column
+ * @method     ChildDrink[]|ObjectCollection findByDescription(string $description) Return ChildDrink objects filtered by the description column
  * @method     ChildDrink[]|ObjectCollection findByCompanyId(int $company_id) Return ChildDrink objects filtered by the company_id column
  * @method     ChildDrink[]|ObjectCollection findByStyleName(string $style_name) Return ChildDrink objects filtered by the style_name column
  * @method     ChildDrink[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -204,7 +209,7 @@ abstract class DrinkQuery extends ModelCriteria
      */
     protected function findPkSimple($key, ConnectionInterface $con)
     {
-        $sql = 'SELECT id, name, picture, company_id, style_name FROM drink WHERE id = :p0';
+        $sql = 'SELECT id, name, picture, description, company_id, style_name FROM drink WHERE id = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -363,15 +368,51 @@ abstract class DrinkQuery extends ModelCriteria
     /**
      * Filter the query on the picture column
      *
-     * @param     mixed $picture The value to use as filter
+     * Example usage:
+     * <code>
+     * $query->filterByPicture('fooValue');   // WHERE picture = 'fooValue'
+     * $query->filterByPicture('%fooValue%', Criteria::LIKE); // WHERE picture LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $picture The value to use as filter.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildDrinkQuery The current query, for fluid interface
      */
     public function filterByPicture($picture = null, $comparison = null)
     {
+        if (null === $comparison) {
+            if (is_array($picture)) {
+                $comparison = Criteria::IN;
+            }
+        }
 
         return $this->addUsingAlias(DrinkTableMap::COL_PICTURE, $picture, $comparison);
+    }
+
+    /**
+     * Filter the query on the description column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDescription('fooValue');   // WHERE description = 'fooValue'
+     * $query->filterByDescription('%fooValue%', Criteria::LIKE); // WHERE description LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $description The value to use as filter.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return $this|ChildDrinkQuery The current query, for fluid interface
+     */
+    public function filterByDescription($description = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($description)) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(DrinkTableMap::COL_DESCRIPTION, $description, $comparison);
     }
 
     /**

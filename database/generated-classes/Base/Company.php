@@ -81,7 +81,7 @@ abstract class Company implements ActiveRecordInterface
     /**
      * The value for the picture field.
      *
-     * @var        resource
+     * @var        string
      */
     protected $picture;
 
@@ -367,7 +367,7 @@ abstract class Company implements ActiveRecordInterface
     /**
      * Get the [picture] column value.
      *
-     * @return resource
+     * @return string
      */
     public function getPicture()
     {
@@ -437,22 +437,19 @@ abstract class Company implements ActiveRecordInterface
     /**
      * Set the value of [picture] column.
      *
-     * @param resource $v new value
+     * @param string $v new value
      * @return $this|\Company The current object (for fluent API support)
      */
     public function setPicture($v)
     {
-        // Because BLOB columns are streams in PDO we have to assume that they are
-        // always modified when a new value is passed in.  For example, the contents
-        // of the stream itself may have changed externally.
-        if (!is_resource($v) && $v !== null) {
-            $this->picture = fopen('php://memory', 'r+');
-            fwrite($this->picture, $v);
-            rewind($this->picture);
-        } else { // it's already a stream
-            $this->picture = $v;
+        if ($v !== null) {
+            $v = (string) $v;
         }
-        $this->modifiedColumns[CompanyTableMap::COL_PICTURE] = true;
+
+        if ($this->picture !== $v) {
+            $this->picture = $v;
+            $this->modifiedColumns[CompanyTableMap::COL_PICTURE] = true;
+        }
 
         return $this;
     } // setPicture()
@@ -540,13 +537,7 @@ abstract class Company implements ActiveRecordInterface
             $this->name = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CompanyTableMap::translateFieldName('Picture', TableMap::TYPE_PHPNAME, $indexType)];
-            if (null !== $col) {
-                $this->picture = fopen('php://memory', 'r+');
-                fwrite($this->picture, $col);
-                rewind($this->picture);
-            } else {
-                $this->picture = null;
-            }
+            $this->picture = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CompanyTableMap::translateFieldName('Location', TableMap::TYPE_PHPNAME, $indexType)];
             $this->location = (null !== $col) ? (string) $col : null;
@@ -735,11 +726,6 @@ abstract class Company implements ActiveRecordInterface
                 } else {
                     $affectedRows += $this->doUpdate($con);
                 }
-                // Rewind the picture LOB column, since PDO does not rewind after inserting value.
-                if ($this->picture !== null && is_resource($this->picture)) {
-                    rewind($this->picture);
-                }
-
                 $this->resetModified();
             }
 
@@ -819,10 +805,7 @@ abstract class Company implements ActiveRecordInterface
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
                     case 'picture':
-                        if (is_resource($this->picture)) {
-                            rewind($this->picture);
-                        }
-                        $stmt->bindValue($identifier, $this->picture, PDO::PARAM_LOB);
+                        $stmt->bindValue($identifier, $this->picture, PDO::PARAM_STR);
                         break;
                     case 'location':
                         $stmt->bindValue($identifier, $this->location, PDO::PARAM_STR);

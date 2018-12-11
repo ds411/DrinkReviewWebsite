@@ -11,7 +11,7 @@ CREATE TABLE [user]
     [password] VARCHAR(255) NOT NULL,
     [real_name] VARCHAR(100) NOT NULL,
     [permissions] TINYINT NOT NULL,
-    [picture] BLOB,
+    [picture] VARCHAR(200),
     [creationTime] TIMESTAMP NOT NULL,
     [lastActivityTime] TIMESTAMP NOT NULL,
     PRIMARY KEY ([username]),
@@ -28,7 +28,7 @@ CREATE TABLE [company]
 (
     [id] INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     [name] VARCHAR(100) NOT NULL,
-    [picture] BLOB,
+    [picture] VARCHAR(200),
     [location] VARCHAR(200),
     [description] MEDIUMTEXT,
     UNIQUE ([id])
@@ -58,7 +58,8 @@ CREATE TABLE [drink]
 (
     [id] INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     [name] VARCHAR(100) NOT NULL,
-    [picture] BLOB,
+    [picture] VARCHAR(200),
+    [description] MEDIUMTEXT NOT NULL,
     [company_id] INTEGER NOT NULL,
     [style_name] VARCHAR(255) NOT NULL,
     UNIQUE ([id]),

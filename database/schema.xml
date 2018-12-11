@@ -5,14 +5,14 @@
 	<column name="password" type="varchar" size="255" required="true" />
 	<column name="real_name" type="varchar" size="100" required="true" />
 	<column name="permissions" type="tinyint" required="true" />
-	<column name="picture" type="blob" />
+	<column name="picture" type="varchar" size="200" />
 	<column name="creationTime" type="timestamp" required="true" />
 	<column name="lastActivityTime" type="timestamp" required="true" />
   </table>
   <table name="company" phpName="Company">
 	<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 	<column name="name" type="varchar" size="100" required="true" />
-	<column name="picture" type="blob" />
+	<column name="picture" type="varchar" size="200" />
 	<column name="location" type="varchar" size="200" />
 	<column name="description" type="longvarchar" />
   </table>
@@ -23,7 +23,8 @@
   <table name="drink" phpName="Drink">
 	<column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
 	<column name="name" type="varchar" size="100" required="true" />
-	<column name="picture" type="blob" />
+	<column name="picture" type="varchar" size="200" />
+	<column name="description" type="longvarchar" required="true" />
 	<column name="company_id" type="integer" required="true" />
 	<column name="style_name" type="varchar" required="true" />
 	<foreign-key foreignTable="company" onDelete="CASCADE">

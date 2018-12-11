@@ -93,7 +93,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUser findOneByPassword(string $password) Return the first ChildUser filtered by the password column
  * @method     ChildUser findOneByRealName(string $real_name) Return the first ChildUser filtered by the real_name column
  * @method     ChildUser findOneByPermissions(int $permissions) Return the first ChildUser filtered by the permissions column
- * @method     ChildUser findOneByPicture(resource $picture) Return the first ChildUser filtered by the picture column
+ * @method     ChildUser findOneByPicture(string $picture) Return the first ChildUser filtered by the picture column
  * @method     ChildUser findOneByCreationtime(string $creationTime) Return the first ChildUser filtered by the creationTime column
  * @method     ChildUser findOneByLastactivitytime(string $lastActivityTime) Return the first ChildUser filtered by the lastActivityTime column *
 
@@ -104,7 +104,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUser requireOneByPassword(string $password) Return the first ChildUser filtered by the password column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildUser requireOneByRealName(string $real_name) Return the first ChildUser filtered by the real_name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildUser requireOneByPermissions(int $permissions) Return the first ChildUser filtered by the permissions column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildUser requireOneByPicture(resource $picture) Return the first ChildUser filtered by the picture column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildUser requireOneByPicture(string $picture) Return the first ChildUser filtered by the picture column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildUser requireOneByCreationtime(string $creationTime) Return the first ChildUser filtered by the creationTime column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildUser requireOneByLastactivitytime(string $lastActivityTime) Return the first ChildUser filtered by the lastActivityTime column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
@@ -113,7 +113,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildUser[]|ObjectCollection findByPassword(string $password) Return ChildUser objects filtered by the password column
  * @method     ChildUser[]|ObjectCollection findByRealName(string $real_name) Return ChildUser objects filtered by the real_name column
  * @method     ChildUser[]|ObjectCollection findByPermissions(int $permissions) Return ChildUser objects filtered by the permissions column
- * @method     ChildUser[]|ObjectCollection findByPicture(resource $picture) Return ChildUser objects filtered by the picture column
+ * @method     ChildUser[]|ObjectCollection findByPicture(string $picture) Return ChildUser objects filtered by the picture column
  * @method     ChildUser[]|ObjectCollection findByCreationtime(string $creationTime) Return ChildUser objects filtered by the creationTime column
  * @method     ChildUser[]|ObjectCollection findByLastactivitytime(string $lastActivityTime) Return ChildUser objects filtered by the lastActivityTime column
  * @method     ChildUser[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -423,13 +423,24 @@ abstract class UserQuery extends ModelCriteria
     /**
      * Filter the query on the picture column
      *
-     * @param     mixed $picture The value to use as filter
+     * Example usage:
+     * <code>
+     * $query->filterByPicture('fooValue');   // WHERE picture = 'fooValue'
+     * $query->filterByPicture('%fooValue%', Criteria::LIKE); // WHERE picture LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $picture The value to use as filter.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildUserQuery The current query, for fluid interface
      */
     public function filterByPicture($picture = null, $comparison = null)
     {
+        if (null === $comparison) {
+            if (is_array($picture)) {
+                $comparison = Criteria::IN;
+            }
+        }
 
         return $this->addUsingAlias(UserTableMap::COL_PICTURE, $picture, $comparison);
     }

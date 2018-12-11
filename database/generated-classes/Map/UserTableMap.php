@@ -160,7 +160,7 @@ class UserTableMap extends TableMap
         $this->addColumn('password', 'Password', 'VARCHAR', true, 255, null);
         $this->addColumn('real_name', 'RealName', 'VARCHAR', true, 100, null);
         $this->addColumn('permissions', 'Permissions', 'TINYINT', true, null, null);
-        $this->addColumn('picture', 'Picture', 'BLOB', false, null, null);
+        $this->addColumn('picture', 'Picture', 'VARCHAR', false, 200, null);
         $this->addColumn('creationTime', 'Creationtime', 'TIMESTAMP', true, null, null);
         $this->addColumn('lastActivityTime', 'Lastactivitytime', 'TIMESTAMP', true, null, null);
     } // initialize()

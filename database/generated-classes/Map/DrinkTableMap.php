@@ -59,7 +59,7 @@ class DrinkTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -69,7 +69,7 @@ class DrinkTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the id field
@@ -85,6 +85,11 @@ class DrinkTableMap extends TableMap
      * the column name for the picture field
      */
     const COL_PICTURE = 'drink.picture';
+
+    /**
+     * the column name for the description field
+     */
+    const COL_DESCRIPTION = 'drink.description';
 
     /**
      * the column name for the company_id field
@@ -108,11 +113,11 @@ class DrinkTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Picture', 'CompanyId', 'StyleName', ),
-        self::TYPE_CAMELNAME     => array('id', 'name', 'picture', 'companyId', 'styleName', ),
-        self::TYPE_COLNAME       => array(DrinkTableMap::COL_ID, DrinkTableMap::COL_NAME, DrinkTableMap::COL_PICTURE, DrinkTableMap::COL_COMPANY_ID, DrinkTableMap::COL_STYLE_NAME, ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'picture', 'company_id', 'style_name', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id', 'Name', 'Picture', 'Description', 'CompanyId', 'StyleName', ),
+        self::TYPE_CAMELNAME     => array('id', 'name', 'picture', 'description', 'companyId', 'styleName', ),
+        self::TYPE_COLNAME       => array(DrinkTableMap::COL_ID, DrinkTableMap::COL_NAME, DrinkTableMap::COL_PICTURE, DrinkTableMap::COL_DESCRIPTION, DrinkTableMap::COL_COMPANY_ID, DrinkTableMap::COL_STYLE_NAME, ),
+        self::TYPE_FIELDNAME     => array('id', 'name', 'picture', 'description', 'company_id', 'style_name', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -122,11 +127,11 @@ class DrinkTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Picture' => 2, 'CompanyId' => 3, 'StyleName' => 4, ),
-        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'picture' => 2, 'companyId' => 3, 'styleName' => 4, ),
-        self::TYPE_COLNAME       => array(DrinkTableMap::COL_ID => 0, DrinkTableMap::COL_NAME => 1, DrinkTableMap::COL_PICTURE => 2, DrinkTableMap::COL_COMPANY_ID => 3, DrinkTableMap::COL_STYLE_NAME => 4, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'picture' => 2, 'company_id' => 3, 'style_name' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Picture' => 2, 'Description' => 3, 'CompanyId' => 4, 'StyleName' => 5, ),
+        self::TYPE_CAMELNAME     => array('id' => 0, 'name' => 1, 'picture' => 2, 'description' => 3, 'companyId' => 4, 'styleName' => 5, ),
+        self::TYPE_COLNAME       => array(DrinkTableMap::COL_ID => 0, DrinkTableMap::COL_NAME => 1, DrinkTableMap::COL_PICTURE => 2, DrinkTableMap::COL_DESCRIPTION => 3, DrinkTableMap::COL_COMPANY_ID => 4, DrinkTableMap::COL_STYLE_NAME => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'picture' => 2, 'description' => 3, 'company_id' => 4, 'style_name' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -148,7 +153,8 @@ class DrinkTableMap extends TableMap
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('name', 'Name', 'VARCHAR', true, 100, null);
-        $this->addColumn('picture', 'Picture', 'BLOB', false, null, null);
+        $this->addColumn('picture', 'Picture', 'VARCHAR', false, 200, null);
+        $this->addColumn('description', 'Description', 'LONGVARCHAR', true, null, null);
         $this->addForeignKey('company_id', 'CompanyId', 'INTEGER', 'company', 'id', true, null, null);
         $this->addForeignKey('style_name', 'StyleName', 'VARCHAR', 'style', 'style', true, 255, null);
     } // initialize()
@@ -342,12 +348,14 @@ class DrinkTableMap extends TableMap
             $criteria->addSelectColumn(DrinkTableMap::COL_ID);
             $criteria->addSelectColumn(DrinkTableMap::COL_NAME);
             $criteria->addSelectColumn(DrinkTableMap::COL_PICTURE);
+            $criteria->addSelectColumn(DrinkTableMap::COL_DESCRIPTION);
             $criteria->addSelectColumn(DrinkTableMap::COL_COMPANY_ID);
             $criteria->addSelectColumn(DrinkTableMap::COL_STYLE_NAME);
         } else {
             $criteria->addSelectColumn($alias . '.id');
             $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.picture');
+            $criteria->addSelectColumn($alias . '.description');
             $criteria->addSelectColumn($alias . '.company_id');
             $criteria->addSelectColumn($alias . '.style_name');
         }

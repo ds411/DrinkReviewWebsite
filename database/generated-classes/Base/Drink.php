@@ -88,9 +88,16 @@ abstract class Drink implements ActiveRecordInterface
     /**
      * The value for the picture field.
      *
-     * @var        resource
+     * @var        string
      */
     protected $picture;
+
+    /**
+     * The value for the description field.
+     *
+     * @var        string
+     */
+    protected $description;
 
     /**
      * The value for the company_id field.
@@ -396,11 +403,21 @@ abstract class Drink implements ActiveRecordInterface
     /**
      * Get the [picture] column value.
      *
-     * @return resource
+     * @return string
      */
     public function getPicture()
     {
         return $this->picture;
+    }
+
+    /**
+     * Get the [description] column value.
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
     }
 
     /**
@@ -466,25 +483,42 @@ abstract class Drink implements ActiveRecordInterface
     /**
      * Set the value of [picture] column.
      *
-     * @param resource $v new value
+     * @param string $v new value
      * @return $this|\Drink The current object (for fluent API support)
      */
     public function setPicture($v)
     {
-        // Because BLOB columns are streams in PDO we have to assume that they are
-        // always modified when a new value is passed in.  For example, the contents
-        // of the stream itself may have changed externally.
-        if (!is_resource($v) && $v !== null) {
-            $this->picture = fopen('php://memory', 'r+');
-            fwrite($this->picture, $v);
-            rewind($this->picture);
-        } else { // it's already a stream
-            $this->picture = $v;
+        if ($v !== null) {
+            $v = (string) $v;
         }
-        $this->modifiedColumns[DrinkTableMap::COL_PICTURE] = true;
+
+        if ($this->picture !== $v) {
+            $this->picture = $v;
+            $this->modifiedColumns[DrinkTableMap::COL_PICTURE] = true;
+        }
 
         return $this;
     } // setPicture()
+
+    /**
+     * Set the value of [description] column.
+     *
+     * @param string $v new value
+     * @return $this|\Drink The current object (for fluent API support)
+     */
+    public function setDescription($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->description !== $v) {
+            $this->description = $v;
+            $this->modifiedColumns[DrinkTableMap::COL_DESCRIPTION] = true;
+        }
+
+        return $this;
+    } // setDescription()
 
     /**
      * Set the value of [company_id] column.
@@ -577,18 +611,15 @@ abstract class Drink implements ActiveRecordInterface
             $this->name = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : DrinkTableMap::translateFieldName('Picture', TableMap::TYPE_PHPNAME, $indexType)];
-            if (null !== $col) {
-                $this->picture = fopen('php://memory', 'r+');
-                fwrite($this->picture, $col);
-                rewind($this->picture);
-            } else {
-                $this->picture = null;
-            }
+            $this->picture = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : DrinkTableMap::translateFieldName('CompanyId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : DrinkTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->description = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : DrinkTableMap::translateFieldName('CompanyId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->company_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : DrinkTableMap::translateFieldName('StyleName', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : DrinkTableMap::translateFieldName('StyleName', TableMap::TYPE_PHPNAME, $indexType)];
             $this->style_name = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -598,7 +629,7 @@ abstract class Drink implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = DrinkTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = DrinkTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException(sprintf('Error populating %s object', '\\Drink'), 0, $e);
@@ -801,11 +832,6 @@ abstract class Drink implements ActiveRecordInterface
                 } else {
                     $affectedRows += $this->doUpdate($con);
                 }
-                // Rewind the picture LOB column, since PDO does not rewind after inserting value.
-                if ($this->picture !== null && is_resource($this->picture)) {
-                    rewind($this->picture);
-                }
-
                 $this->resetModified();
             }
 
@@ -878,6 +904,9 @@ abstract class Drink implements ActiveRecordInterface
         if ($this->isColumnModified(DrinkTableMap::COL_PICTURE)) {
             $modifiedColumns[':p' . $index++]  = 'picture';
         }
+        if ($this->isColumnModified(DrinkTableMap::COL_DESCRIPTION)) {
+            $modifiedColumns[':p' . $index++]  = 'description';
+        }
         if ($this->isColumnModified(DrinkTableMap::COL_COMPANY_ID)) {
             $modifiedColumns[':p' . $index++]  = 'company_id';
         }
@@ -902,10 +931,10 @@ abstract class Drink implements ActiveRecordInterface
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
                     case 'picture':
-                        if (is_resource($this->picture)) {
-                            rewind($this->picture);
-                        }
-                        $stmt->bindValue($identifier, $this->picture, PDO::PARAM_LOB);
+                        $stmt->bindValue($identifier, $this->picture, PDO::PARAM_STR);
+                        break;
+                    case 'description':
+                        $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
                     case 'company_id':
                         $stmt->bindValue($identifier, $this->company_id, PDO::PARAM_INT);
@@ -985,9 +1014,12 @@ abstract class Drink implements ActiveRecordInterface
                 return $this->getPicture();
                 break;
             case 3:
-                return $this->getCompanyId();
+                return $this->getDescription();
                 break;
             case 4:
+                return $this->getCompanyId();
+                break;
+            case 5:
                 return $this->getStyleName();
                 break;
             default:
@@ -1023,8 +1055,9 @@ abstract class Drink implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
             $keys[2] => $this->getPicture(),
-            $keys[3] => $this->getCompanyId(),
-            $keys[4] => $this->getStyleName(),
+            $keys[3] => $this->getDescription(),
+            $keys[4] => $this->getCompanyId(),
+            $keys[5] => $this->getStyleName(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1136,9 +1169,12 @@ abstract class Drink implements ActiveRecordInterface
                 $this->setPicture($value);
                 break;
             case 3:
-                $this->setCompanyId($value);
+                $this->setDescription($value);
                 break;
             case 4:
+                $this->setCompanyId($value);
+                break;
+            case 5:
                 $this->setStyleName($value);
                 break;
         } // switch()
@@ -1177,10 +1213,13 @@ abstract class Drink implements ActiveRecordInterface
             $this->setPicture($arr[$keys[2]]);
         }
         if (array_key_exists($keys[3], $arr)) {
-            $this->setCompanyId($arr[$keys[3]]);
+            $this->setDescription($arr[$keys[3]]);
         }
         if (array_key_exists($keys[4], $arr)) {
-            $this->setStyleName($arr[$keys[4]]);
+            $this->setCompanyId($arr[$keys[4]]);
+        }
+        if (array_key_exists($keys[5], $arr)) {
+            $this->setStyleName($arr[$keys[5]]);
         }
     }
 
@@ -1231,6 +1270,9 @@ abstract class Drink implements ActiveRecordInterface
         }
         if ($this->isColumnModified(DrinkTableMap::COL_PICTURE)) {
             $criteria->add(DrinkTableMap::COL_PICTURE, $this->picture);
+        }
+        if ($this->isColumnModified(DrinkTableMap::COL_DESCRIPTION)) {
+            $criteria->add(DrinkTableMap::COL_DESCRIPTION, $this->description);
         }
         if ($this->isColumnModified(DrinkTableMap::COL_COMPANY_ID)) {
             $criteria->add(DrinkTableMap::COL_COMPANY_ID, $this->company_id);
@@ -1326,6 +1368,7 @@ abstract class Drink implements ActiveRecordInterface
     {
         $copyObj->setName($this->getName());
         $copyObj->setPicture($this->getPicture());
+        $copyObj->setDescription($this->getDescription());
         $copyObj->setCompanyId($this->getCompanyId());
         $copyObj->setStyleName($this->getStyleName());
 
@@ -2015,6 +2058,7 @@ abstract class Drink implements ActiveRecordInterface
         $this->id = null;
         $this->name = null;
         $this->picture = null;
+        $this->description = null;
         $this->company_id = null;
         $this->style_name = null;
         $this->alreadyInSave = false;

@@ -57,7 +57,7 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildCompany findOneById(int $id) Return the first ChildCompany filtered by the id column
  * @method     ChildCompany findOneByName(string $name) Return the first ChildCompany filtered by the name column
- * @method     ChildCompany findOneByPicture(resource $picture) Return the first ChildCompany filtered by the picture column
+ * @method     ChildCompany findOneByPicture(string $picture) Return the first ChildCompany filtered by the picture column
  * @method     ChildCompany findOneByLocation(string $location) Return the first ChildCompany filtered by the location column
  * @method     ChildCompany findOneByDescription(string $description) Return the first ChildCompany filtered by the description column *
 
@@ -66,14 +66,14 @@ use Propel\Runtime\Exception\PropelException;
  *
  * @method     ChildCompany requireOneById(int $id) Return the first ChildCompany filtered by the id column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildCompany requireOneByName(string $name) Return the first ChildCompany filtered by the name column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
- * @method     ChildCompany requireOneByPicture(resource $picture) Return the first ChildCompany filtered by the picture column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
+ * @method     ChildCompany requireOneByPicture(string $picture) Return the first ChildCompany filtered by the picture column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildCompany requireOneByLocation(string $location) Return the first ChildCompany filtered by the location column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  * @method     ChildCompany requireOneByDescription(string $description) Return the first ChildCompany filtered by the description column and throws \Propel\Runtime\Exception\EntityNotFoundException when not found
  *
  * @method     ChildCompany[]|ObjectCollection find(ConnectionInterface $con = null) Return ChildCompany objects based on current ModelCriteria
  * @method     ChildCompany[]|ObjectCollection findById(int $id) Return ChildCompany objects filtered by the id column
  * @method     ChildCompany[]|ObjectCollection findByName(string $name) Return ChildCompany objects filtered by the name column
- * @method     ChildCompany[]|ObjectCollection findByPicture(resource $picture) Return ChildCompany objects filtered by the picture column
+ * @method     ChildCompany[]|ObjectCollection findByPicture(string $picture) Return ChildCompany objects filtered by the picture column
  * @method     ChildCompany[]|ObjectCollection findByLocation(string $location) Return ChildCompany objects filtered by the location column
  * @method     ChildCompany[]|ObjectCollection findByDescription(string $description) Return ChildCompany objects filtered by the description column
  * @method     ChildCompany[]|\Propel\Runtime\Util\PropelModelPager paginate($page = 1, $maxPerPage = 10, ConnectionInterface $con = null) Issue a SELECT query based on the current ModelCriteria and uses a page and a maximum number of results per page to compute an offset and a limit
@@ -333,13 +333,24 @@ abstract class CompanyQuery extends ModelCriteria
     /**
      * Filter the query on the picture column
      *
-     * @param     mixed $picture The value to use as filter
+     * Example usage:
+     * <code>
+     * $query->filterByPicture('fooValue');   // WHERE picture = 'fooValue'
+     * $query->filterByPicture('%fooValue%', Criteria::LIKE); // WHERE picture LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $picture The value to use as filter.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return $this|ChildCompanyQuery The current query, for fluid interface
      */
     public function filterByPicture($picture = null, $comparison = null)
     {
+        if (null === $comparison) {
+            if (is_array($picture)) {
+                $comparison = Criteria::IN;
+            }
+        }
 
         return $this->addUsingAlias(CompanyTableMap::COL_PICTURE, $picture, $comparison);
     }
