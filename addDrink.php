@@ -41,6 +41,7 @@ else {
             $.post({
                 url:$(this).attr('action'),
                 data:formData,
+                processData:false,
                 contentType:false,
                 success:function(data) {
                     console.log(data);
@@ -62,23 +63,22 @@ EOT;
             ->find();
         $companyOptions = "";
         foreach ($companies as $company) {
+            $id = $company->getId();
             $name = $company->getName();
-            $companyOptions .= "<option value='$name'>$name</option>";
+            $companyOptions .= "<option value='$id'>$name</option>";
         }
 
         $content = sprintf($content, $companyOptions, $styleOptions);
 
 
         include 'template.php';
-    } else {
+    }
+    else {
         $drink = new Drink();
-        $drink
-            ->setName($_POST['name'])
-            ->setCompany($_POST['company'])
-            ->setStyle($_POST['style'])
-            ->setDescription($_POST['description']);
+        $style = StyleQuery::create()->findOneByStyle($_POST['style']);
+        $company = CompanyQuery::create()->findOneById($_POST['company']);
 
-        if (isset($_FILES['image'])) {
+        if (isset($_FILES['image']) && $_FILES['image']['error'] !== 4) {
             if (getimagesize($_FILES['image']['tmp_name']) === false) {
                 die("ERROR: File is not a valid image.");
             } else if (filesize($_FILES['image']) > 1024 * 1024) {
@@ -87,14 +87,28 @@ EOT;
                 $dir = "images/";
                 $newFileName = uniqid("", true) . pathinfo($_FILES['image']['name'])['extension'];
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $dir . $newFileName)) {
-                    $drink->setPicture($newFileName);
+                    $drink
+                        ->setName($_POST['name'])
+                        ->setCompanyId($_POST['company'])
+                        ->setStyleName($_POST['style'])
+                        ->setDescription($_POST['description'])
+                        ->setPicture($newFileName)
+                        ->save();
                 } else {
                     die("ERROR: File could not be saved.");
                 }
             }
         }
+        else {
+            $drink
+                ->setName($_POST['name'])
+                ->setCompany($company)
+                ->setStyle($style)
+                ->setDescription($_POST['description'])
+                ->save();
+        }
 
-        $drink->save();
+
     }
 }
 ?>

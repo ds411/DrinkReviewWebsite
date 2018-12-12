@@ -1,25 +1,24 @@
-<?php 
+<?php
 
-$title = "COMPANY NAME";
+if(!isset($_SESSION)) session_start();
 
-$content = <<<EOT
-		<div class='jumbotron dc-container'>
-			<div class='row dc-info'>
-				<div class='col-md-2' style='background-color:red;'>
-				company img
-				</div>
-				<div class='col-md-6' style='background-color:blue;'>
-				company name, loc
-				</div>
-				<div class='col-md-4' style='background-color:red;'>
-				other info about company
-				</div>
-			</div>
-		</div>
-		<div class='company-other'>
-		other by company or related
-		</div>
-EOT;
+require_once "vendor/autoload.php";
+require_once "database/generated-conf/config.php";
+require_once "sessionAuth.php";
+
+if(isset($_GET['c'])) {
+    if(CompanyQuery::create()->filterById($_GET['c'])->exists()) {
+        $id = $_GET['c'];
+        include "companyTemplate.php";
+    }
+    else {
+        header("Location: company.php");
+    }
+}
+else {
+    include "companyList.php";
+}
+
 
 include 'template.php';
 

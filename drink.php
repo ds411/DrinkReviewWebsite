@@ -1,25 +1,24 @@
-<?php 
+<?php
 
-$title = "DRINK NAME";
-	
-$content = <<<EOT
-		<div class='jumbotron dc-container'>
-			<div class='row dc-info'>
-				<div class='col-md-2' style='background-color:red;'>
-				drink img
-				</div>
-				<div class='col-md-6' style='background-color:blue;'>
-				drink name, company, review average
-				</div>
-				<div class='col-md-4' style='background-color:red;'>
-				other info about drink
-				</div>
-			</div>
-		</div>
-		<div class='drink-reviews'>
-		user reviews
-		</div>
-EOT;
+if(!isset($_SESSION)) session_start();
+
+require_once "vendor/autoload.php";
+require_once "database/generated-conf/config.php";
+require_once "sessionAuth.php";
+
+if(isset($_GET['d'])) {
+    if(DrinkQuery::create()->filterById($_GET['d'])->exists()) {
+        $id = $_GET['d'];
+        include "drinkTemplate.php";
+    }
+    else {
+        header("Location: drink.php");
+    }
+}
+else {
+    include "drinkList.php";
+}
+
 
 include 'template.php';
 
