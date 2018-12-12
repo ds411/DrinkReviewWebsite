@@ -11,8 +11,9 @@ $content = <<<EOT
 			<div class='imgUpload'>
 				<label for="file-upload" class="custom-file-upload">
 				    <i class="fas fa-upload"></i> Change Image
+				    <input id="profileImg-upload" type="file"/>
 				</label>
-				<input id="profileImg-upload" type="file"/>
+				
 			</div>
 		</div>
 		<div class='col-md-8 profile-post'>
