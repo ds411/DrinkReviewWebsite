@@ -13,23 +13,24 @@ else {
 
     if (!isset($_POST['name'], $_POST['company'], $_POST['style'], $_POST['description'])) {
         $content = <<<EOT
-		<div class='add-drink'>
+        <h4>Add A Drink</h4>
+		<div class='add-drink form-group'>
 			<form method='POST' action='addDrink.php' enctype="multipart/form-data">
-				<label>Image:</label>
-				<input type='file' name='image' id='image'/><br/>
+				<label>Image for Drink:</label><br/>
+				<input type='file' name='image' id='image' class='form-control-file'/><br/>
 				<label>Drink Name:</label>
-				<input type='text' name='name' id='name' required/><br/>
+				<input type='text' name='name' id='name' class='form-control' required/><br/>
 				<label>Company:</label>
-				<select name='company' id='company' required>
+				<select name='company' id='company' class='form-control' required>
 				    %s
 				</select><br/>
 				<label>Style:</label>
-				<select name='style' id='style' required>
+				<select name='style' id='style' class='form-control' required>
 				    %s
 				</select><br/>
 				<label>Description:</label>
-				<textarea name='description' id='description' required></textarea><br/>
-				<input type="submit" /></br>
+				<textarea name='description' id='description' class='form-control' required></textarea><br/>
+				<button type="submit" class='btn btn-primary'>Add Drink</button></br>
 			</form>
 		</div>
         <script>

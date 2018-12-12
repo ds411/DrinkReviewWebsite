@@ -12,17 +12,18 @@ else {
 
     if (!isset($_POST['name'], $_POST['location'], $_POST['description'])) {
         $content = <<<EOT
-		<div class='add-company'>
+        <h4>Add A Company</h4>
+		<div class='add-company form-group'>
 			<form method='POST' action='addCompany.php' enctype="multipart/form-data">
 				<label>Image for Comapny:</label>
-				<input type='file' name='image' id='image'/><br/>
+				<input type='file' name='image' id='image' class='form-control-file'/><br/>
 				<label>Company Name:</label>
-				<input type='text' name='name' id='name' required /><br/>
+				<input type='text' name='name' id='name' class='form-control' required /><br/>
 				<label>Location:</label>
-				<input type='text' name='location' id='location' placeholder='Country or State or City???' required /><br/>
+				<input type='text' name='location' id='location' placeholder='...' class='form-control' required /><br/>
 				<label>Description:</label>
-				<textarea name='description' id='description' required></textarea><br/>
-				<input type='submit' /></br>
+				<textarea name='description' id='description' class='form-control' required></textarea><br/>
+				<button type='submit' class='btn btn-primary'>Add Company</br>
 			</form>
 		</div>
         <script>
