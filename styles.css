@@ -12,12 +12,6 @@
 	   -moz-box-shadow: 0 8px 6px -6px gray;
 	        box-shadow: 0 8px 6px -6px gray;
 }
-.new-post-btn {
-	border-radius: 5px;
-	height: 4%;
-	margin: auto;
-	padding: 0 20px;
-}
 .login-page {
 	padding-top: 10%;
 	background-color: #F8F8FF;
@@ -51,6 +45,33 @@
 }
 .feed-body {
 	font-size: 18px;
+}
+
+.post-area {
+	resize: none;
+	width: 65%;
+	margin-left: 17%;
+	height:2.5em;
+	display:inline-block;
+    vertical-align: top;
+}
+#postBtn {
+	display:inline-block;
+    vertical-align: top;
+    width: 100px;
+}
+@media (max-width:768px) {
+	.post-area {
+		width: 100%;
+		margin-left:0;
+	}
+	.new-post {
+		text-align: center;
+	}
+	#postBtn {
+		margin-top:1%;
+		text-align: center;
+	}
 }
 
 /* Profile */

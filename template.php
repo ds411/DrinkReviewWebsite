@@ -39,34 +39,6 @@
 				  	<a class='dropdown-item' href='#'>Logout</a>
 				  </div>
 				</li>
-				<!-- Button trigger modal -->
-				<button type="button" class="btn-success new-post-btn" data-toggle="modal" data-target="#exampleModal" style='margin-left: 10px;'>
-				  <i class="fas fa-plus-circle"></i>
-				</button>
-
-
-				<!-- Modal -->
-				<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-				  <div class="modal-dialog modal-lg" role="document">
-				    <div class="modal-content">
-				      <div class="modal-header">
-				        <h5 class="modal-title" id="exampleModalLabel">Make a New Post</h5>
-				        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-				          <span aria-hidden="true">&times;</span>
-				        </button>
-				      </div>
-				      <div class="modal-body">
-				      	<form action='createPost.php' method='POST' id='postForm'>
-				        	<textarea maxlength='200' id='postArea' name="body" style='width:100%;height:150px;resize: none;'></textarea>
-				        </form>
-				      </div>
-				      <div class="modal-footer">
-				        <button type="button" class="btn btn-danger" data-dismiss="modal" id='discardBtn'>Discard</button>
-				        <button type="button" class="btn btn-success" data-dismiss="modal" id='postBtn'>Post</button>
-				      </div>
-				    </div>
-				  </div>
-				</div>
 			</ul>
 			<!-- -->
 		</div>
