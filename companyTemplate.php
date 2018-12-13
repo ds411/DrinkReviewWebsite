@@ -90,10 +90,11 @@ $content = <<<EOT
 				    <img src="%s" height="150" width="150" />
 				</div>
 				<div class='col-md-6'>
-				%s, %s
+				    <p>Name: <b>%s</b></p>
+                    <p>Location: <b>%s</b></p>
 				</div>
 				<div class='col-md-4'>
-				%s
+				    <p class='dc-desc'>%s</p>
 				</div>
 			</div>
 		</div>

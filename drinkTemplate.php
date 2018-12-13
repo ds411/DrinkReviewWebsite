@@ -33,7 +33,9 @@ $reviewModels = ReviewQuery::create()
     ->offset($offset)
     ->find();
 
-$reviews = "";
+$reviews = "<div class='review-container'>
+				<h5>Reviews</h5>
+			</div>";
 foreach($reviewModels as $review) {
     $post = $review->getPost();
     $username = $post->getUsername();
@@ -41,7 +43,7 @@ foreach($reviewModels as $review) {
     $body = $post->getBody();
     $rating = $review->getRating();
     $reviews .=
-        "<div class='review'><p><a href='profile.php?u=$username' class='feed-user'>$username</a></p>$rating<p class='review-body'>$body</p><p class='review-time'>Posted on $timestamp</p></div>";
+        "<div class='review-post'><p><a href='profile.php?u=$username' class='feed-user'>$username</a></p><p>Rating: $rating / 5</p><p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
 }
 
 $reviewForm = "";
@@ -103,10 +105,13 @@ $content = <<<EOT
 				    <img src="%s" height="150" width="150" />
 				</div>
 				<div class='col-md-6'>
-				%s, %s, %s
+					<p>Company: <b>%s</b></p>
+					<p>Style: <b>%s</b></p>
+					<p>Average Rating: <b>%s</b></p>
 				</div>
 				<div class='col-md-4'>
-				%s
+					<p>Description:</p>
+					<p class='dc-desc'>%s</p>
 				</div>
 			</div>
 		</div>

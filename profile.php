@@ -50,7 +50,7 @@ foreach($postModels as $post) {
     if(($review = $post->getReview()) !== null) {
         $id = $review->getDrinkId();
         $drink = " &#x3e; <a href='drink.php?d=$id'>" . $review->getDrink()->getName() . "</a>";
-        $rating = "<p class='rating'>" . $review->getRating() . "</p>";
+        $rating = "<p class='rating'>Rating: <b>" . $review->getRating() . " / 5</b></p>";
     }
     $posts .=
         "<div class='feed-post'><p><a href='profile.php?u=$username' class='feed-user'>$username</a>$drink</p>$rating<p class='feed-body'>$body</p><p class='feed-time'>Posted on $timestamp</p></div>";
