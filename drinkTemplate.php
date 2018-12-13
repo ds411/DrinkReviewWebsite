@@ -45,17 +45,35 @@ foreach($reviewModels as $review) {
 $content = <<<EOT
 		<div class='jumbotron dc-container'>
 			<div class='row dc-info'>
-				<div class='col-md-2' style='background-color:red;'>
+				<div class='col-md-2'>
 				    <img src="%s" height="150" width="150" />
 				</div>
-				<div class='col-md-6' style='background-color:blue;'>
+				<div class='col-md-6'>
 				%s, %s, %s
 				</div>
-				<div class='col-md-4' style='background-color:red;'>
+				<div class='col-md-4'>
 				%s
 				</div>
 			</div>
 		</div>
+
+		<!-- ********* only show if they haven't reviewed drink yet ***** -->
+		<div class='drink-make-review'>
+			<h5>Write a Review</h5>
+			<form method='POST' action='#'>
+				<label>Score</label>
+				<select name='userScore' id='userScore' class='form-control' required>
+					<option>1</option>
+					<option>2</option>
+					<option>3</option>
+					<option>4</option>
+					<option selected>5</option>
+				</select>
+				<label>Review</label>
+				<textarea class='form-control'></textarea>
+			</form>
+		</div>
+		<hr/>
 		<div class='drink-reviews'>
 		%s
 		</div>

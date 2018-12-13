@@ -2,7 +2,6 @@
 	background-color: #F8F8FF;
 	padding-top: 1%;
 	box-shadow: -5px 0 5px -5px #333, 5px 0 5px -5px #333;
-	height:100vh;
 }
 
 .navbar {
@@ -33,7 +32,6 @@
 .feed-types {
 	border-right: solid #343a40;
   	border-width: thin;
-  	height: 85vh;
 }
 .feed-post {
 	background-color: #F2F2F2;
@@ -132,8 +130,9 @@
 
 /* Drink / company */
 .dc-container {
-	height: 325px;
+	height: 300px;
 	margin:auto;
+	box-shadow: 0 4px 2px -2px gray;
 }
 .dc-info {
 	height: 200px;
@@ -142,11 +141,16 @@
 
 /* Drink page */
 .drink-reviews {
-	height: 500px;
+	height: 400px;
+}
+.drink-make-review {
+	padding-top: 1%;
+	margin: auto;
+	width: 50%;
 }
 
 /* Company page */
 
 .company-other {
-	height: 500px;
+	height: 400px;
 }

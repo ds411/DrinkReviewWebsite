@@ -90,13 +90,13 @@ $drinkTable = "<table><thead>$drinksListHeader</thead><tbody>$drinksList</tbody>
 $content = <<<EOT
 		<div class='jumbotron dc-container'>
 			<div class='row dc-info'>
-				<div class='col-md-2' style='background-color:red;'>
+				<div class='col-md-2'>
 				    <img src="%s" height="150" width="150" />
 				</div>
-				<div class='col-md-6' style='background-color:blue;'>
+				<div class='col-md-6'>
 				%s, %s
 				</div>
-				<div class='col-md-4' style='background-color:red;'>
+				<div class='col-md-4'>
 				%s
 				</div>
 			</div>
