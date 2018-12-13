@@ -8,7 +8,14 @@ require_once "sessionAuth.php";
 
 if(isset($_POST['body']) && SessionAuth::isValid()) {
     $username = $_SESSION['username'];
-    $body = $_POST['body'];
+    $body = htmlspecialchars($_POST['body']);
+    $mentions = array();
+    preg_match('/@[\w-]+/', $body, $mentions);
+    foreach($mentions as $mention) {
+        $u = substr($mention, 1);
+        $body = str_replace($mention, "<a href='profile.php?u=$u'>$mention</a>", $body);
+    }
+    print($body);
     $now = new DateTime();
 
     $post = new Post();

@@ -19,6 +19,7 @@ else {
     $validSession = SessionAuth::isValid();
 
     $style = $model[0]->getStyle();
+    $title = $style;
     $description = $model[0]->getDescription();
     $drinks = DrinkQuery::create()
         ->filterByStyleName($style)

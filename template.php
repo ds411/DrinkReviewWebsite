@@ -53,7 +53,7 @@
 				  <div class='dropdown-menu'>
 				  	<a class='dropdown-item' href='profile.php'>Visit Profile</a>
 				  	<div class="dropdown-divider"></div>
-				  	<a class='dropdown-item' href='#'>Logout</a>
+				  	<a class='dropdown-item' href='logout.php?t=<?php echo $_SERVER['REQUEST_URI'] ?>'>Logout</a>
 				  </div>
 				</li>
 			</ul>

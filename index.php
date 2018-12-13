@@ -9,7 +9,9 @@ require_once "sessionAuth.php";
 $page = "feed";
 
 if(SessionAuth::isValid()) {
-	include "feed.php";
+	if(isset($_GET['s']) && $_GET['s'] === 'mentions') include "mentions.php";
+	else include "feed.php";
+
 }
 else {
 	include "loginForm.php";

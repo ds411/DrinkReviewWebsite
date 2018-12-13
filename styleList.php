@@ -6,6 +6,8 @@ require_once "vendor/autoload.php";
 require_once "database/generated-conf/config.php";
 require_once "sessionAuth.php";
 
+$title = "Style List";
+
 $models = StyleQuery::create()
     ->find();
 

@@ -6,17 +6,11 @@ require_once "vendor/autoload.php";
 require_once "database/generated-conf/config.php";
 require_once "sessionAuth.php";
 
-$title = "Your Feed";
+$title = "Your Mentions";
 
 $content = <<<EOF
     <div class='new-post row'>
         <div class='col-md-2'>
-        </div>
-        <div class='col-md-10 new-post-container'>
-            <form action='createPost.php' method='POST' id='postForm'>
-                <textarea maxlength='200' id='postArea' name="body" class='post-area' onfocus='focusFunc()' onblur='blurFunc()' placeholder='New Post...'></textarea>
-                <button type="button" class="btn btn-success" id='postBtn'>Post</button>
-            </form>
         </div>
     </div>
 	<div class='row feed-info'>
@@ -35,16 +29,6 @@ $content = <<<EOF
 		</div>
 	</div>
     <script>
-
-    function focusFunc() {
-        $('.post-area').animate({height:"5em"}, 500);
-    }
-    function blurFunc() {
-        if (!$.trim($("#postArea").val())) {
-            $('.post-area').animate({height:"2.5em"}, 500);
-        }
-    }
-    
     var page = 0;
     var morePages = true;
     
@@ -52,7 +36,7 @@ $content = <<<EOF
         if($(window).scrollTop() === $(document).height() - $(window).height()) {
             if(morePages) {
                 $.ajax({
-                    url:'feedScroll.php',
+                    url:'mentionsScroll.php',
 					method:'POST',
 					async:'false',
                     data:{page:page},
@@ -73,33 +57,13 @@ $content = <<<EOF
             }
         }
     });
-    
-    $('#postBtn').click(function(event) {
-        $.post({
-            url:'createPost.php',
-            data:$('#postForm').serialize(),
-            success:function(data) {
-                $('#postArea').val("");
-                if (!$.trim($("#postArea").val())) {
-                    $('.post-area').animate({height:"2.5em"}, 500);
-                }
-                if(data.indexOf('<') !== -1) {
-                    $('#feed-post-container').prepend(data);
-                }
-            }
-        });
-    });
     </script>
 EOF;
 
-$friends = FriendQuery::create()
-    ->select('Friend.Friend_Username')
-    ->findByUsername($_SESSION['username']);
+$mention = '@' . $_SESSION['username'];
 
 $initialFeedPosts = PostQuery::create()
-    ->where('Post.Username IN ?', $friends)
-    ->_or()
-    ->where('Post.Username = ?', $_SESSION['username'])
+    ->where("Post.Body LIKE '%>$mention<%'")
     ->orderByCreationtime('DESC')
     ->limit(20)
     ->find();
