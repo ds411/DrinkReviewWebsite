@@ -160,14 +160,12 @@
 
 /* Drink / company */
 .dc-container {
-	height: 300px;
 	margin:auto;
-	box-shadow: 0 4px 2px -2px gray;
-	background-color:#333745;
+	box-shadow: 0 5px 2px -2px gray;
+	background-color: #44484e;
 	color:white;
 }
 .dc-info {
-	height: 200px;
 	text-align:left;
 }
 
