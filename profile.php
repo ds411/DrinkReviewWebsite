@@ -59,7 +59,7 @@ foreach($postModels as $post) {
 $friendModels = $user->getFriendsRelatedByUsername();
 $friends = "";
 foreach($friendModels as $friend) {
-    $name = $friend->getUsername();
+    $name = $friend->getFriendUsername();
     $friends .= "<div><a href='profile.php?u=$name'>$name</a></div>";
 }
 
@@ -92,9 +92,54 @@ if(SessionAuth::isValid() && $_SESSION['username'] === $username) {
             });
             </script>
 EOT;
+    $followButton = "";
 }
 else {
     $imageUpload = "";
+    if(FriendQuery::create()->filterByUsername($_SESSION['username'])->filterByFriendUsername($username)->exists()) {
+        $btnClass = 'btn-danger';
+        $btnText = "Unfollow";
+    }
+    else {
+        $btnClass = 'btn-success';
+        $btnText = "Follow";
+    }
+
+    $followButton = <<<EOT
+            <div class='follow-btn-div'>
+                <button action='button' class='btn btn-lg %s follow-btn' id='followBtn'>%s</button>
+            </div>
+            <script>
+            var u = '%s';
+            
+            $('.btn-danger.follow-btn').click(function(event) {
+                let btn = $(this);
+                $.post({
+                    url:'follow.php',
+                    data:{func:'unfollow', u:u},
+                    success:function(data) {
+                        console.log(data);
+                        if(data === 'Success') {
+                            $(btn).html('Follow').removeClass('btn-danger').addClass('btn-success');
+                        }
+                    }
+                });
+            });
+            $('.btn-success.follow-btn').click(function(event) {
+                let btn = $(this);
+                $.post({
+                    url:'follow.php',
+                    data:{func:'follow', u:u},
+                    success:function(data) {
+                        if(data === 'Success') {
+                            $(btn).html('Unfollow').removeClass('btn-success').addClass('btn-danger');
+                        }
+                    }
+                });
+            });
+            </script>
+EOT;
+    $followButton = sprintf($followButton, $btnClass, $btnText, $username);
 }
 
 
@@ -105,9 +150,7 @@ $content = <<<EOT
 				<img id="profileImg" src="%s" height="150" width="150" />
 			</div>
 			%s
-            <div class='follow-btn-div'>
-                <button action='button' class='btn btn-success btn-lg follow-btn' id='followBtn'>Follow</button>
-            </div>
+            %s
 		</div>
 		<div class='col-md-8 profile-post'>
 			%s
@@ -118,7 +161,7 @@ $content = <<<EOT
 	</div>
 EOT;
 
-$content = sprintf($content, $image, $imageUpload, $posts, $friends);
+$content = sprintf($content, $image, $imageUpload, $followButton, $posts, $friends);
 
 include "template.php";
 ?>
