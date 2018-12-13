@@ -21,12 +21,26 @@
 				<li class='nav-item active'>
 				   <a class='nav-link' href='index.php''>Home<span class='sr-only'>(current)</span></a>
 				</li>
-				<li class='nav-item'>
-				  <a class='nav-link' href='drink.php''>Browse Drinks</a>
-				</li>
-				<li class='nav-item'>
-				  <a class='nav-link' href='company.php'>Browse Companies</a>
-				</li>
+				<li class="nav-item dropdown">
+			        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			          Browse
+			        </a>
+			        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+			          <a class="dropdown-item" href="drink.php">Browse Drinks</a>
+			          <div class='dropdown-divider'></div>
+			          <a class="dropdown-item" href="company.php">Browse Companies</a>
+			        </div>
+			      </li>
+				<li class="nav-item dropdown">
+			        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			          Add
+			        </a>
+			        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+			          <a class="dropdown-item" href="addDrink.php">Add a Drink</a>
+			          <div class='dropdown-divider'></div>
+			          <a class="dropdown-item" href="addCompany.php">Add a Company</a>
+			        </div>
+			      </li>
 			</ul>
 				<form class='form-inline my-2 my-lg-0'>
 				  <input class='form-control mr-sm-2' type='search' placeholder='Search'>
@@ -35,7 +49,7 @@
 			<!-- Only show if logged in -->
 			<ul class='navbar-nav mt-2 mt-lg-0' style='margin-left: 10px;'>
 				<li class='nav-item dropdown'>
-				  <a class='nav-link dropdown-toggle' data-toggle='dropdown' href='#' role='button'>Profile</a>
+				  <a class='nav-link dropdown-toggle' data-toggle='dropdown' href='#' role='button'><i class="fas fa-user"></i></a>
 				  <div class='dropdown-menu'>
 				  	<a class='dropdown-item' href='profile.php'>Visit Profile</a>
 				  	<div class="dropdown-divider"></div>
