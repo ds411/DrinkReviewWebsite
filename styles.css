@@ -50,11 +50,11 @@
 
 .post-area {
 	resize: none;
-	width: 65%;
-	margin-left: 17%;
+	width: 80%;
 	height:2.5em;
 	display:inline-block;
     vertical-align: top;
+    border-radius: 5px;
 }
 #postBtn {
 	display:inline-block;
@@ -62,6 +62,10 @@
     width: 100px;
 }
 @media (max-width:768px) {
+	.feed-types {
+		min-height: auto;
+		border:0;
+	}
 	.post-area {
 		width: 100%;
 		margin-left:0;

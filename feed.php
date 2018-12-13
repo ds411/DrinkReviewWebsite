@@ -9,11 +9,15 @@ require_once "sessionAuth.php";
 $title = "Your Feed";
 
 $content = <<<EOF
-    <div class='new-post'>
-        <form action='createPost.php' method='POST' id='postForm'>
-            <textarea maxlength='200' id='postArea' name="body" class='post-area' onfocus='focusFunc()' onblur='blurFunc()' placeholder='New Post...'></textarea>
-            <button type="button" class="btn btn-success" id='postBtn'>Post</button>
-        </form>
+    <div class='new-post row'>
+        <div class='col-md-2'>
+        </div>
+        <div class='col-md-10 new-post-container'>
+            <form action='createPost.php' method='POST' id='postForm'>
+                <textarea maxlength='200' id='postArea' name="body" class='post-area' onfocus='focusFunc()' onblur='blurFunc()' placeholder='New Post...'></textarea>
+                <button type="button" class="btn btn-success" id='postBtn'>Post</button>
+            </form>
+        </div>
     </div>
 	<div class='row feed-info'>
 		<div class='col-md-2 feed-types'>
