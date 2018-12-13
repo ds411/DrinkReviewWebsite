@@ -105,6 +105,9 @@ $content = <<<EOT
 				<img id="profileImg" src="%s" height="150" width="150" />
 			</div>
 			%s
+            <div class='follow-btn-div'>
+                <button action='button' class='btn btn-success btn-lg follow-btn' id='followBtn'>Follow</button>
+            </div>
 		</div>
 		<div class='col-md-8 profile-post'>
 			%s
