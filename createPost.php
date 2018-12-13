@@ -13,7 +13,8 @@ if(isset($_POST['body']) && SessionAuth::isValid()) {
     preg_match('/@[\w-]+/', $body, $mentions);
     foreach($mentions as $mention) {
         $u = substr($mention, 1);
-        $body = str_replace($mention, "<a href='profile.php?u=$u'>$mention</a>", $body);
+        if(UserQuery::create()->findOneByUsername($u) !== null)
+            $body = str_replace($mention, "<a href='profile.php?u=$u'>$mention</a>", $body);
     }
     print($body);
     $now = new DateTime();
