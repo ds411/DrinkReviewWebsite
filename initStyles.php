@@ -10,6 +10,10 @@ if(!isset(StyleQuery::create()->filterByStyle('IPA')->find()[0])) {
     $s = new Style();
     $s->setStyle('IPA')->setDescription('Description goes here')->save();
 }
+if(!isset(StyleQuery::create()->filterByStyle('Lager')->find()[0])) {
+    $s = new Style();
+    $s->setStyle('Lager')->setDescription('Lager beer')->save();
+}
 
 
 ?>
