@@ -69,12 +69,12 @@ if(SessionAuth::isValid() && $_SESSION['username'] === $username) {
 				<label for="file-upload" class="custom-file-upload">
 				    <i class="fas fa-upload"></i> Change Image
 				    <form id="imgUploadForm">
-				        <input id="profileImg-upload" type="file"/>
+				        <input id="profileImg-upload" name='image' type="file"/>
 				    </form>
 				</label>
 			</div>
 			<script>
-            $('#profileImg-upload').change(function(event) {
+            $('#imgUploadForm').change(function(event) {
                 $.post({
                     url:'profileImageUpload.php',
                     data:new FormData(this),
