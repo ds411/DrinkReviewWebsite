@@ -20,7 +20,7 @@ $models = CompanyQuery::create()
     ->orderBy($col, $order)
     ->find();
 
-$content = "<table><thead><tr><th>Company Name <a href='company.php?b=cn&o=d'>&#9660</a><a href='company.php?b=cn&o=a'>&#9650</a></th><th>Number of Drinks <a href='company.php?b=nd&o=d'>&#9660</a><a href='company.php?b=nd&o=a'>&#9650</a></th></tr></thead><tbody>";
+$content = "<table class='table'><thead><tr><th>Company Name <a href='company.php?b=cn&o=d'>&#9660</a><a href='company.php?b=cn&o=a'>&#9650</a></th><th>Number of Drinks <a href='company.php?b=nd&o=d'>&#9660</a><a href='company.php?b=nd&o=a'>&#9650</a></th></tr></thead><tbody>";
 
 foreach($models as $model) {
     $id = $model->getId();

@@ -81,7 +81,7 @@ foreach($drinks as $drink) {
     $drinksList .= "<tr><td><a href='drink.php?d=$drinkId'>$drinkName</a></td><td>$style</td><td>$drinkAvgRating</td><td>$reviewCount</td>$userRating</tr>";
 }
 
-$drinkTable = "<table><thead>$drinksListHeader</thead><tbody>$drinksList</tbody></table>";
+$drinkTable = "<table class='table'><thead>$drinksListHeader</thead><tbody>$drinksList</tbody></table>";
 
 $content = <<<EOT
 		<div class='jumbotron dc-container'>
@@ -94,6 +94,7 @@ $content = <<<EOT
                     <p>Location: <b>%s</b></p>
 				</div>
 				<div class='col-md-4'>
+                    <p>Description:</p>
 				    <p class='dc-desc'>%s</p>
 				</div>
 			</div>

@@ -22,10 +22,10 @@
 				   <a class='nav-link' href='index.php''>Home<span class='sr-only'>(current)</span></a>
 				</li>
 				<li class='nav-item'>
-				  <a class='nav-link' href='drinkList.php''>Browse Drinks</a>
+				  <a class='nav-link' href='drink.php''>Browse Drinks</a>
 				</li>
 				<li class='nav-item'>
-				  <a class='nav-link' href='companyList.php'>Browse Companies</a>
+				  <a class='nav-link' href='company.php'>Browse Companies</a>
 				</li>
 			</ul>
 				<form class='form-inline my-2 my-lg-0'>
