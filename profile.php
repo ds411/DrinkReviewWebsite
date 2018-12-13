@@ -53,7 +53,7 @@ foreach($postModels as $post) {
         $rating = "<p class='rating'>" . $review->getRating() . "</p>";
     }
     $posts .=
-        "<div class='feed-post'><p><a href='profile.php?u=$username' class='feed-user'>$username</a>$drink</p>$rating<p class='feed-time'>Posted on $timestamp</p><p class='feed-body'>$body</p></div>";
+        "<div class='feed-post'><p><a href='profile.php?u=$username' class='feed-user'>$username</a>$drink</p>$rating<p class='feed-body'>$body</p><p class='feed-time'>Posted on $timestamp</p></div>";
 }
 
 $friendModels = $user->getFriendsRelatedByUsername();

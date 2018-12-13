@@ -41,7 +41,7 @@ foreach($reviewModels as $review) {
     $body = $post->getBody();
     $rating = $review->getRating();
     $reviews .=
-        "<div class='review'><p><a href='profile.php?u=$username' class='feed-user'>$username</a></p>$rating<p class='review-time'>Posted on $timestamp</p><p class='review-body'>$body</p></div>";
+        "<div class='review'><p><a href='profile.php?u=$username' class='feed-user'>$username</a></p>$rating<p class='review-body'>$body</p><p class='review-time'>Posted on $timestamp</p></div>";
 }
 
 $reviewForm = "";
