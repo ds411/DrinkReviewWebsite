@@ -29,6 +29,8 @@
 			          <a class="dropdown-item" href="drink.php">Browse Drinks</a>
 			          <div class='dropdown-divider'></div>
 			          <a class="dropdown-item" href="company.php">Browse Companies</a>
+                        <div class='dropdown-divider'></div>
+                        <a class="dropdown-item" href="style.php">Browse Styles</a>
 			        </div>
 			      </li>
 				<li class="nav-item dropdown">
