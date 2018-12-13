@@ -17,6 +17,9 @@
 	background-color: #F8F8FF;
 	/*text-align: center; */
 }
+.form-errors {
+	color:red;
+}
 
 /* Feed */
 .feed-info {
@@ -133,9 +136,10 @@
 }
 .imgUpload {
 	text-align: center;
-	padding-top: 2%;
+	padding-top: 5%;
 }
 .follow-btn-div {
+	padding-top: 5%;
 	text-align: center;
 }
 .follow-btn {
@@ -159,6 +163,8 @@
 	height: 300px;
 	margin:auto;
 	box-shadow: 0 4px 2px -2px gray;
+	background-color:#333745;
+	color:white;
 }
 .dc-info {
 	height: 200px;

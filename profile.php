@@ -60,7 +60,7 @@ $friendModels = $user->getFriendsRelatedByUsername();
 $friends = "";
 foreach($friendModels as $friend) {
     $name = $friend->getFriendUsername();
-    $friends .= "<div><a href='profile.php?u=$name'>$name</a></div>";
+    $friends .= "<div><a href='profile.php?u=$name' class='list-group-item' >$name</a></div>";
 }
 
 if(SessionAuth::isValid() && $_SESSION['username'] === $username) {
@@ -157,7 +157,9 @@ $content = <<<EOT
 		</div>
 		<div class='col-md-2 friend-info'>
             <h5>Friends List</h5>
-			%s
+                <ul class='list-group list-group-flush'>
+			      %s
+                </ul>
 		</div>
 	</div>
 EOT;

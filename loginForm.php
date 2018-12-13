@@ -14,28 +14,28 @@ $content = <<<EOF
 			<h5>New? Create an account:</h5>
 			<form action='register.php' method='POST'>
 			    <p class='form-errors'></p>
-				<label>Name</label><br/>
-				<input type='text' name='name'/><br/>
-				<label>Username</label><br/>
-				<input type='text' name='username'/><br/>
+				<label>Name</label>
+				<input type='text' name='name' class='form-control'/>
+				<label>Username</label>
+				<input type='text' name='username' class='form-control'/>
 				<label>Password</label><br/>
-				<input type='password' name='password'/><br/>
-				<label>Confirm Password</label><br/>
-				<input type='password' name='confirmPassword'/><br/>
+				<input type='password' name='password' class='form-control'/>
+				<label>Confirm Password</label>
+				<input type='password' name='confirmPassword' class='form-control'/>
 				<br/>
-				<button type='submit' id='registerBtn'>Register</button>
+				<button type='submit' id='registerBtn' class='btn btn-primary'>Register</button>
 			</form>
 		</div>
 		<div class='col login-col form-group'>
 			<h5>Already have an account? Login:</h5>
 			<form action='login.php' method='POST'>
 			    <p class='form-errors'></p>
-				<label>Username</label><br/>
-				<input type='text' name='username'/><br/>
-				<label>Password</label><br/>
-				<input type='password' name='password'/><br/>
+				<label>Username</label>
+				<input type='text' name='username' class='form-control'/>
+				<label>Password</label>
+				<input type='password' name='password' class='form-control'/>
 				<br/>
-				<button type='submit' id='loginBtn'>Login</button>
+				<button type='submit' id='loginBtn' class='btn btn-primary'>Login</button>
 			</form>
 		</div>
 		<script>
