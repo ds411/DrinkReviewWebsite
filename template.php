@@ -1,7 +1,7 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title><?php echo $title ?></title>
+	<title><?php echo $title ?> - BrewReviews</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 	<link rel="stylesheet" href="styles.css">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
@@ -12,7 +12,7 @@
 <body background='bg.png'>
 	<!-- Bootstrap --> 
 	<nav class='navbar navbar-expand-lg navbar-light bg-light'>
-	  <a class='navbar-brand' href='index.php'>Drinksite</a>
+	  <a class='navbar-brand' href='index.php'>BrewReviews <i class="fas fa-beer"></i></a>
 		<button class='navbar-toggler' type='button' data-toggle='collapse' data-target='#navbarTogglerDemo02' aria-controls='navbarTogglerDemo02' aria-expanded='false' aria-label='Toggle navigation'>
 		   <span class='navbar-toggler-icon'></span>
 		</button>
