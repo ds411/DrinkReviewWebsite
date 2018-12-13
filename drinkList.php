@@ -36,7 +36,7 @@ if($validSession) {
     $userReviewsDrinkRatings = $userReviews->getColumnValues('rating');
 }
 else $validSessionHeaders = "";
-$content = "<table class='table'><thead><tr><th>Drink Name <a href='drink.php?b=dn&o=d'>&#9660</a><a href='drink.php?b=dn&o=a'>&#9650</a></th></th><th>Style <a href='drink.php?b=s&o=d'>&#9660</a><a href='drink.php?b=s&o=a'>&#9650</a></th><th>Average Rating <a href='drink.php?b=ar&o=d'>&#9660</a><a href='drink.php?b=ar&o=a'>&#9650</a></th></th><th>Number of Reviews <a href='drink.php?b=nr&o=d'>&#9660</a><a href='drink.php?b=nr&o=a'>&#9650</a></th>$validSessionHeaders</tr></thead><tbody>";
+$content = "<table class='table table-striped'><thead><tr><th>Drink Name <a href='drink.php?b=dn&o=d'>&#9660</a><a href='drink.php?b=dn&o=a'>&#9650</a></th></th><th>Style <a href='drink.php?b=s&o=d'>&#9660</a><a href='drink.php?b=s&o=a'>&#9650</a></th><th>Average Rating <a href='drink.php?b=ar&o=d'>&#9660</a><a href='drink.php?b=ar&o=a'>&#9650</a></th></th><th>Number of Reviews <a href='drink.php?b=nr&o=d'>&#9660</a><a href='drink.php?b=nr&o=a'>&#9650</a></th>$validSessionHeaders</tr></thead><tbody>";
 
 foreach($models as $model) {
     $id = $model->getId();
