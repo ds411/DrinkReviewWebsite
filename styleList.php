@@ -11,12 +11,12 @@ $title = "Style List";
 $models = StyleQuery::create()
     ->find();
 
-$content = "";
+$content = "<table class='table table-striped'><thead><th>Style</th><th>Description</th></thead><tbody>";
 
 foreach($models as $model) {
     $style = $model->getStyle();
     $description = $model->getDescription();
-    $content .= "<div><a href='style.php?s=$style'><div><h3>$style</h3><p>$description</p></div></a></div>";
+    $content .= "<tr class='style-types'><td><a href='style.php?s=$style'><h4>$style</h4></td><td><p>$description</p></a></td></tr>";
 }
-
+$content .= "</tbody></table>"
 ?>
