@@ -53,7 +53,8 @@ if($validSession) {
         ->filterByUsername($_SESSION['username'])
         ->endUse()
         ->find();
-    $userReviewsDrinkIds = $userReviews->getColumnValues('drink_id');
+    $userReviewsDrinkIds = $userReviews->getColumnValues('drinkid');
+    $userReviewsDrinkRatings = $userReviews->getColumnValues('rating');
 }
 
 if($validSession) {
@@ -73,13 +74,8 @@ foreach($drinks as $drink) {
     $reviewCount = $drink->getVirtualColumn('numRatings');
 
     if($validSession) {
-        if(!isset($userReviewsDrinkIds[$drinkId])) $userRating = '<td>-.--</td>';
-        else $userRating = $userReviewsDrinkIds[$drinkId];
-    }
-    $userRating = "<td>-.--</td>";
-
-    if($reviewCount === 0) {
-        $drinkAvgRating = "-.--";
+        if(!in_array($drinkId, $userReviewsDrinkIds)) $userRating = '<td>-.--</td>';
+        else $userRating = "<td>" . $userReviewsDrinkRatings[array_search($drinkId, $userReviewsDrinkIds)] . "</td>";
     }
 
     $drinksList .= "<tr><td><a href='drink.php?d=$drinkId'>$drinkName</a></td><td>$style</td><td>$drinkAvgRating</td><td>$reviewCount</td>$userRating</tr>";

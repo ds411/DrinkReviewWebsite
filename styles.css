@@ -2,6 +2,7 @@
 	background-color: #F8F8FF;
 	padding-top: 1%;
 	box-shadow: -5px 0 5px -5px #333, 5px 0 5px -5px #333;
+	min-height:100vh;
 }
 
 .navbar {
@@ -32,6 +33,7 @@
 .feed-types {
 	border-right: solid #343a40;
   	border-width: thin;
+	min-height:85vh;
 }
 .feed-post {
 	background-color: #F2F2F2;

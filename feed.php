@@ -6,8 +6,6 @@ require_once "vendor/autoload.php";
 require_once "database/generated-conf/config.php";
 require_once "sessionAuth.php";
 
-use Propel\Runtime\ActiveQuery\Criteria;
-
 $title = "Your Feed";
 
 $content = <<<EOF
@@ -32,12 +30,15 @@ $content = <<<EOF
     var morePages = true;
     
     $(window).scroll(function(event) {
-        if($(window).scrollTop() == $(document).height() - $(window).height()) {
+        if($(window).scrollTop() === $(document).height() - $(window).height()) {
             if(morePages) {
-                $.post({
+                $.ajax({
                     url:'feedScroll.php',
+					method:'POST',
+					async:'false',
                     data:{page:page},
                     success:function(data) {
+                        console.log(data);
                         if(data.indexOf('<') != -1) {
                             $('#feed-post-container').append(data);
                             page++;
@@ -59,7 +60,6 @@ $content = <<<EOF
             url:'createPost.php',
             data:$('#postForm').serialize(),
             success:function(data) {
-                console.log(data);
                 if(data.indexOf('<') !== -1) {
                     $('#feed-post-container').prepend(data);
                 }
@@ -77,7 +77,7 @@ $initialFeedPosts = PostQuery::create()
     ->filterByUsername($friends)
     ->_or()
     ->filterByUsername($_SESSION['username'])
-    ->orderByCreationtime(Criteria::DESC)
+    ->orderById('DESC')
     ->limit(20)
     ->find();
 
@@ -92,7 +92,7 @@ foreach($initialFeedPosts as $post) {
     $rating = "";
     if(($review = $post->getReview()) !== null) {
         $id = $review->getDrinkId();
-        $drink = " &#x3e; <a href='drink/?d=$id>'" . $review->getDrink()->getName() . "</a>";
+        $drink = " &#x3e; <a href='drink.php?d=$id'>" . $review->getDrink()->getName() . "</a>";
         $rating = "<p class='rating'>" . $review->getRating() . "</p>";
     }
     $initialFeed .=

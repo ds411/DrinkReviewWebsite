@@ -20,12 +20,12 @@ else {
 
     $style = $model[0]->getStyle();
     $description = $model[0]->getDescription();
-    $drinks = $model[0]->getDrinks();
     $drinks = DrinkQuery::create()
         ->filterByStyleName($style)
         ->leftJoin('Drink.Review')
-        ->withColumn('AVG(Review.Rating)', 'avgRating')
+        ->withColumn('AVG(Review.Rating)', 'averageRating')
         ->withColumn('COUNT(Review.Rating)', 'numRatings')
+        ->groupBy('Drink.Id')
         ->find();
 
 
@@ -37,7 +37,8 @@ else {
             ->filterByUsername($_SESSION['username'])
             ->endUse()
             ->find();
-        $userReviewsDrinkIds = $userReviews->getColumnValues('drink_id');
+        $userReviewsDrinkIds = $userReviews->getColumnValues('drinkid');
+        $userReviewsDrinkRatings = $userReviews->getColumnValues('rating');
     }
     else $validSessionHeaders = "";
 
@@ -46,22 +47,15 @@ else {
 
     foreach($drinks as $drink) {
         $drinkId = $drink->getId();
-        if($drinkId === null) break;
         $drinkName = $drink->getName();
-        if(($drinkAvgRating = $drink->getVirtualColumn('avgRating')) === null) {
+        if(($drinkAvgRating = $drink->getVirtualColumn('averageRating')) === null) {
             $drinkAvgRating = "-.--";
         }
         $reviewCount = $drink->getVirtualColumn('numRatings');
 
-
         if($validSession) {
-            if(!isset($userReviewsDrinkIds[$drinkId])) $userRating = '<td>-.--</td>';
-            else $userRating = $userReviewsDrinkIds[$drinkId];
-        }
-        $userRating = "<td>-.--</td>";
-
-        if($reviewCount === 0) {
-            $drinkAvgRating = "-.--";
+            if(!in_array($drinkId, $userReviewsDrinkIds)) $userRating = '<td>-.--</td>';
+            else $userRating = "<td>" . $userReviewsDrinkRatings[array_search($drinkId, $userReviewsDrinkIds)] . "</td>";
         }
 
         $drinksList .= "<tr><td><a href='drink.php?d=$drinkId'>$drinkName</a></td><td>$drinkAvgRating</td><td>$reviewCount</td>$userRating</tr>";

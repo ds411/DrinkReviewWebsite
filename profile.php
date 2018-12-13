@@ -49,7 +49,7 @@ foreach($postModels as $post) {
     $rating = "";
     if(($review = $post->getReview()) !== null) {
         $id = $review->getDrinkId();
-        $drink = " &#x3e; <a href='drink/?d=$id>'" . $review->getDrink()->getName() . "</a>";
+        $drink = " &#x3e; <a href='drink.php?d=$id'>" . $review->getDrink()->getName() . "</a>";
         $rating = "<p class='rating'>" . $review->getRating() . "</p>";
     }
     $posts .=

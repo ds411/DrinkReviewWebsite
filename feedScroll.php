@@ -13,18 +13,18 @@ if(isset($_POST['page'])) {
         ->select(array('friend_username'))
         ->findByUsername($_SESSION['username']);
 
-    $offset = intval($_POST['page']) + 20;
+    $offset = $_POST['page'] * 10 +  20;
 
     $feedPosts = PostQuery::create()
+		->orderByCreationtime(Criteria::DESC)
         ->filterByUsername($friends)
         ->_or()
         ->filterByUsername($_SESSION['username'])
-        ->orderByCreationtime(Criteria::DESC)
         ->offset($offset)
         ->limit(10)
         ->find();
 
-    if(empty($feedPosts)) {
+    if($feedPosts[0] === null) {
         echo "End.";
     }
     else {
@@ -39,11 +39,11 @@ if(isset($_POST['page'])) {
             $rating = "";
             if(($review = $post->getReview()) !== null) {
                 $id = $review->getDrinkId();
-                $drink = " &#x3e; <a href='drink/?d=$id>'" . $review->getDrink()->getName() . "</a>";
+                $drink = " &#x3e; <a href='drink.php?d=$id'>" . $review->getDrink()->getName() . "</a>";
                 $rating = "<p class='rating'>" . $review->getRating() . "</p>";
             }
             $feed .=
-                "<div class='feed-post'><p><a href='profile/?u=$username'>$username</a>$drink</p>$rating<p>Posted on $timestamp</p><p>$body</p></div>";
+                "<div class='feed-post'><p><a href='profile.php?u=$username'>$username</a>$drink</p>$rating<p>Posted on $timestamp</p><p>$body</p></div>";
         }
 
         echo $feed;
