@@ -156,6 +156,7 @@ $content = <<<EOT
 			%s
 		</div>
 		<div class='col-md-2 friend-info'>
+            <h5>Friends List</h5>
 			%s
 		</div>
 	</div>
