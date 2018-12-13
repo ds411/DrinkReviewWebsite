@@ -70,14 +70,14 @@ $content = <<<EOF
 EOF;
 
 $friends = FriendQuery::create()
-    ->select(array('friend_username'))
+    ->select('Friend.Friend_Username')
     ->findByUsername($_SESSION['username']);
 
 $initialFeedPosts = PostQuery::create()
-    ->filterByUsername($friends)
+    ->where('Post.Username IN ?', $friends)
     ->_or()
-    ->filterByUsername($_SESSION['username'])
-    ->orderById('DESC')
+    ->where('Post.Username = ?', $_SESSION['username'])
+    ->orderByCreationtime('DESC')
     ->limit(20)
     ->find();
 
