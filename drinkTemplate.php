@@ -18,7 +18,10 @@ else {
 }
 
 $company = $model->getCompany()->getName();
+$company_id = $model->getCompanyId();
+$company = "<a href='company.php?c=$company_id'>$company</a>";
 $style = $model->getStyleName();
+$style = "<a href='style.php?s=$style'>$style</a>";
 $description = $model->getDescription();
 $averageRating = $model->getVirtualColumn('averageRating');
 
@@ -73,24 +76,6 @@ if($validSession) {
 				</br>
 				<input type="submit" />
 			</form>
-			<script>
-			$('#submitReview').submit(function(event) {
-			    event.preventDefault();
-			    $.post({
-			        url:$(this).attr('action'),
-			        data:$(this).serialize(),
-			        success:function(data) {
-			            if(data === 'Success.') {
-			                $('.drink-review').append(data);
-			                $('.drink-make-review').remove();
-			            }
-			            else {
-			                console.log(data);
-			            }
-			        }
-			    });
-			});
-            </script>
 		</div>
 EOT;
         $reviewForm = sprintf($reviewForm, $id);
@@ -117,9 +102,27 @@ $content = <<<EOT
 		</div>
 		%s
 		<hr/>
-		<div class='drink-reviews'>
+		<div id='drink-reviews'>
 		%s
 		</div>
+		<script>
+		$('#submitReview').submit(function(event) {
+		    event.preventDefault();
+		    $.post({
+		        url:$(this).attr('action'),
+		        data:$(this).serialize(),
+		        success:function(data) {
+		            if(data.indexOf('<') !== -1) {
+		                $('#drink-reviews').append(data);
+		                $('.drink-make-review').remove();
+		            }
+		            else {
+		                console.log(data);
+		            }
+		        }
+		    });
+		});
+        </script>
 EOT;
 
 

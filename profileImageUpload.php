@@ -12,7 +12,6 @@ if(SessionAuth::isValid()) {
 
 
     if (isset($_FILES['image']) && getimagesize($_FILES['image']['tmp_name']) !== false) {
-        echo 1;
         if (filesize($_FILES['image']) > 1024 * 1024) {
             die("ERROR: File exceeds 1 MB.");
         } else {

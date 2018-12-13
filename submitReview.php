@@ -22,7 +22,7 @@ if($validSession && $review === null) {
     $now = new DateTime();
     $post
         ->setUsername($username)
-        ->setBody($body)
+        ->setBody(htmlspecialchars($body))
         ->setCreationtime($now)
         ->save();
     $review
@@ -33,7 +33,8 @@ if($validSession && $review === null) {
 
     $timestamp = $now->format('Y-m-d H:i:s');
 
-    echo "<div class='review'><p><a href='profile.php?u=$username' class='feed-user'>$username</a></p>$rating<p class='review-time'>Posted on $timestamp</p><p class='review-body'>$body</p></div>";
+    echo "<div class='review-post'><p><a href='profile.php?u=$username' class='feed-user'>$username</a></p><p>Rating: $rating / 5</p><p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
 }
+else echo "1";
 
 ?>

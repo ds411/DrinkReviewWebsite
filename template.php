@@ -48,17 +48,21 @@
 				  <input class='form-control mr-sm-2' type='search' placeholder='Search'>
 				  <button class='btn btn-outline-success my-2 my-sm-0' type='submit'>Search</button>
 				</form>
-			<!-- Only show if logged in -->
+			<?php if(isset($_SESSION['username'])) {
+			    $uri = $_SERVER['REQUEST_URI'];
+			    echo "
 			<ul class='navbar-nav mt-2 mt-lg-0' style='margin-left: 10px;'>
 				<li class='nav-item dropdown'>
-				  <a class='nav-link dropdown-toggle' data-toggle='dropdown' href='#' role='button'><i class="fas fa-user"></i></a>
+				  <a class='nav-link dropdown-toggle' data-toggle='dropdown' href='#' role='button'><i class='fas fa-user'></i></a>
 				  <div class='dropdown-menu'>
 				  	<a class='dropdown-item' href='profile.php'>Visit Profile</a>
-				  	<div class="dropdown-divider"></div>
-				  	<a class='dropdown-item' href='logout.php?t=<?php echo $_SERVER['REQUEST_URI'] ?>'>Logout</a>
+				  	<div class='dropdown-divider'></div>
+				  	<a class='dropdown-item' href='logout.php?t=$uri'>Logout</a>
 				  </div>
 				</li>
 			</ul>
+";
+} ?>
 			<!-- -->
 		</div>
 	</nav>

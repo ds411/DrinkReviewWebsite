@@ -16,7 +16,6 @@ if(isset($_POST['body']) && SessionAuth::isValid()) {
         if(UserQuery::create()->findOneByUsername($u) !== null)
             $body = str_replace($mention, "<a href='profile.php?u=$u'>$mention</a>", $body);
     }
-    print($body);
     $now = new DateTime();
 
     $post = new Post();
