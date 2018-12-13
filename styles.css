@@ -87,6 +87,7 @@
 .profile-post {
 	border-right: 1px solid #343a40;
 	border-left: 1px solid #343a40;
+	min-height: 85vh;
 }
 @media (max-width:768px) {
 	.profile-post {
@@ -106,7 +107,7 @@
 	margin: auto;
 	width: 150px;
 	height: 150px;
-	border: 1px solid black;;
+	border: 1px solid black;
 }
 #profileImg-upload{
     cursor: inherit;

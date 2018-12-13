@@ -62,7 +62,7 @@ else {
         $drinksList .= "<tr><td><a href='drink.php?d=$drinkId'>$drinkName</a></td><td>$drinkAvgRating</td><td>$reviewCount</td>$userRating</tr>";
     }
 
-    $content = "<div><h3>$style</h3><p>$description</p></div><table><thead>$drinksListHeader</thead><tbody>$drinksList</tbody></table>";
+    $content = "<div><h3>$style</h3><p>$description</p></div><table class='table table-striped'><thead>$drinksListHeader</thead><tbody>$drinksList</tbody></table>";
 }
 
 ?>
