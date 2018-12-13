@@ -30,7 +30,7 @@
 	min-height:85vh;
 }
 .feed-post {
-	background-color: #F2F2F2;
+	background-color: #FCFCFC;
 	border-radius: 5px;
 	margin-bottom: 1%;
 	padding: 5px 15px;
@@ -138,19 +138,10 @@
 }
 
 /* Browse */
-.breadcrumbs {
-	background-color: #F8F8FF;
-	padding-top: 1%;
-
-}
 .browse-body {
 	background-color: #F8F8FF;
 	padding-top: 3%;
 	height: 200px;
-}
-.filter-info {
-	border-right: solid #343a40;
-  	border-width: thin;
 }
 
 .add-company, .add-drink {
@@ -182,7 +173,7 @@
 	padding-left: 5%;
 }
 .review-post {
-	background-color:#F2F2F2;
+	background-color: #FCFCFC;
 	border-radius: 5px;
 	margin-bottom: 1%;
 	padding: 5px 15px;
