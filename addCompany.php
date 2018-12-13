@@ -20,7 +20,7 @@ else {
 				<label>Company Name:</label>
 				<input type='text' name='name' id='name' class='form-control' required /><br/>
 				<label>Location:</label>
-				<input type='text' name='location' id='location' placeholder='...' class='form-control' required /><br/>
+				<input type='text' name='location' id='location' placeholder='Country or State or City...' class='form-control' required /><br/>
 				<label>Description:</label>
 				<textarea name='description' id='description' class='form-control' required></textarea><br/>
 				<button type='submit' class='btn btn-primary'>Add Company</br>
