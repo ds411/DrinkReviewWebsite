@@ -60,11 +60,12 @@ $reviews = "<div class='review-container'>
 foreach($reviewModels as $review) {
     $post = $review->getPost();
     $username = $post->getUsername();
+    $name = $post->getUser()->getRealName();
     $timestamp = $post->getCreationtime()->format('Y-m-d H:i:s');
     $body = $post->getBody();
     $rating = $review->getRating();
     $reviews .=
-        "<div class='review-post' style='margin-bottom:1%;'><p><a href='profile.php?u=$username' class='feed-user'>$username</a></p><p>Rating: $rating / 5</p><p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
+        "<div class='review-post' style='margin-bottom:1%;'><p><a href='profile.php?u=$username' class='feed-user'>$name</a></p><p>Rating: $rating / 5</p><p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
 }
 
 //Review form is empty by default
@@ -137,7 +138,7 @@ $content = <<<EOT
 		        data:$(this).serialize(),
 		        success:function(data) {
 		            if(data.indexOf('<') !== -1) {
-		                $('#drink-reviews').prepend(data);
+		                $('.review-container').after(data);
 		                $('.drink-make-review').remove();
 		            }
 		            else {

@@ -37,9 +37,10 @@ if($validSession && $review === null) {
         ->save();
 
     $timestamp = $now->format('Y-m-d H:i:s');
+    $name = $post->getUser()->getRealName();
 
     //html
-    echo "<div class='review-post'><p><a href='profile.php?u=$username' class='feed-user'>$username</a></p><p>Rating: $rating / 5</p><p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
+    echo "<div class='review-post'><p><a href='profile.php?u=$username' class='feed-user'>$name</a></p><p>Rating: $rating / 5</p><p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
 }
 
 ?>

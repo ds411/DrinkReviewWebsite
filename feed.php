@@ -111,6 +111,7 @@ $initialFeedPosts = PostQuery::create()
 $initialFeed = "";
 foreach($initialFeedPosts as $post) {
     $username = $post->getUsername();
+    $name = $post->getUser()->getRealName();
     $timestamp = $post->getCreationtime()->format('Y-m-d H:i:s');
     $body = $post->getBody();
     $id = "";
@@ -124,7 +125,7 @@ foreach($initialFeedPosts as $post) {
         $rating = "<p class='rating'>Rating: <b>" . $review->getRating() . " / 5</b></p>";
     }
     $initialFeed .=
-        "<div class='feed-post'><p><a href='profile.php?u=$username' class='feed-user'>$username</a>$drink</p>$rating<p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
+        "<div class='feed-post'><p><a href='profile.php?u=$username' class='feed-user'>$name</a>$drink</p>$rating<p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
 }
 
 $content = sprintf($content, $initialFeed);

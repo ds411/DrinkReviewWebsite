@@ -56,9 +56,9 @@ EOT;
         //New company
         $company = new Company();
         $company
-            ->setName($_POST['name'])
-            ->setLocation($_POST['location'])
-            ->setDescription($_POST['description']);
+            ->setName(htmlspecialchars($_POST['name']))
+            ->setLocation(htmlspecialchars($_POST['location']))
+            ->setDescription(htmlspecialchars($_POST['description']));
 
         //Check for valid picture upload
         if (isset($_FILES['image']) && getimagesize($_FILES['image']['tmp_name']) !== false) {

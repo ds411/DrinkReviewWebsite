@@ -90,10 +90,10 @@ EOT;
         $company = CompanyQuery::create()->findOneById($_POST['company']);
 
         $drink
-            ->setName($_POST['name'])
+            ->setName(htmlspecialchars($_POST['name']))
             ->setCompany($company)
             ->setStyle($style)
-            ->setDescription($_POST['description']);
+            ->setDescription(htmlspecialchars($_POST['description']));
 
         //Check for valid picture upload
         if (isset($_FILES['image']) && $_FILES['image']['error'] !== 4) {
