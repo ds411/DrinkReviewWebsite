@@ -1,3 +1,6 @@
+<?php
+//Template for all pages
+?>
 <html>
 <head>
 	<meta charset="UTF-8">
@@ -65,8 +68,5 @@
 	<div class='container'>
 		<?php echo $content ?>
 	</div>
-<?php
-//print($token);
-?>
 </body>
 </html>

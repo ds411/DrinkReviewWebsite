@@ -11,7 +11,10 @@ else {
 
     $title = "Add a Drink";
 
+    //If not receiving form, display page
     if (!isset($_POST['name'], $_POST['company'], $_POST['style'], $_POST['description'])) {
+
+        //html
         $content = <<<EOT
         <h4>Add A Drink</h4>
 		<div class='add-drink form-group'>
@@ -44,13 +47,14 @@ else {
                 processData:false,
                 contentType:false,
                 success:function(data) {
-                    console.log(data);
+                    if(data === "Success.") $('form')[0].reset();
                 }
             });
         });
         </script>
 EOT;
 
+        //Generate style options from DB
         $styles = StyleQuery::create()
             ->find();
         $styleOptions = "";
@@ -59,6 +63,7 @@ EOT;
             $styleOptions .= "<option value='$name'>$name</option>";
         }
 
+        //Generate company options from DB
         $companies = CompanyQuery::create()
             ->find();
         $companyOptions = "";
@@ -68,16 +73,29 @@ EOT;
             $companyOptions .= "<option value='$id'>$name</option>";
         }
 
+        //Insert option lists to html
         $content = sprintf($content, $companyOptions, $styleOptions);
 
 
         include 'template.php';
     }
+    //If receiving form, process it
     else {
+
+        //New drink
         $drink = new Drink();
+        //Drink style
         $style = StyleQuery::create()->findOneByStyle($_POST['style']);
+        //Drink company
         $company = CompanyQuery::create()->findOneById($_POST['company']);
 
+        $drink
+            ->setName($_POST['name'])
+            ->setCompany($company)
+            ->setStyle($style)
+            ->setDescription($_POST['description']);
+
+        //Check for valid picture upload
         if (isset($_FILES['image']) && $_FILES['image']['error'] !== 4) {
             if (getimagesize($_FILES['image']['tmp_name']) === false) {
                 die("ERROR: File is not a valid image.");
@@ -88,25 +106,15 @@ EOT;
                 $newFileName = uniqid("", true) . pathinfo($_FILES['image']['name'])['extension'];
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $dir . $newFileName)) {
                     $drink
-                        ->setName($_POST['name'])
-                        ->setCompanyId($_POST['company'])
-                        ->setStyleName($_POST['style'])
-                        ->setDescription($_POST['description'])
-                        ->setPicture($newFileName)
-                        ->save();
+                        ->setPicture($newFileName);
                 } else {
                     die("ERROR: File could not be saved.");
                 }
             }
         }
-        else {
-            $drink
-                ->setName($_POST['name'])
-                ->setCompany($company)
-                ->setStyle($style)
-                ->setDescription($_POST['description'])
-                ->save();
-        }
+
+        //Save drink
+        if($drink->save()) echo "Success.";
 
 
     }

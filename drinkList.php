@@ -2,19 +2,25 @@
 
 $title = "Drink List";
 
+//Page offset
 if(isset($_GET['page'])) $offset = $_GET['page'] * 20;
 else $offset = 0;
 
+//Sort order
 if(isset($_GET['o']) && $_GET['o'] === 'd') $order = 'DESC';
 else $order = 'ASC';
 
+//Valid session
 $validSession = SessionAuth::isValid();
+
+//Sort column
 $sortBy = isset($_GET['b']);
 if($sortBy && $_GET['b'] === 'nr') $col = 'reviewCount';
 else if($sortBy && $_GET['b'] === 'ar') $col = 'averageRating';
 else if($sortBy && $_GET['b'] === 's') $col = 'style_name';
 else $col = 'name';
 
+//Drinks
 $models = DrinkQuery::create()
     ->leftJoin('Drink.Review')
     ->withColumn('COUNT(Review.PostId)', 'reviewCount')
@@ -25,6 +31,7 @@ $models = DrinkQuery::create()
     ->orderBy($col, $order)
     ->find();
 
+//Extra columns for logged in users
 if($validSession) {
     $validSessionHeaders = "<th>Your Rating</th>";
     $userReviews = ReviewQuery::create()
@@ -36,8 +43,11 @@ if($validSession) {
     $userReviewsDrinkRatings = $userReviews->getColumnValues('rating');
 }
 else $validSessionHeaders = "";
+
+//Create table
 $content = "<table class='table table-striped'><thead><tr><th>Drink Name <a href='drink.php?b=dn&o=d'>&#9660</a><a href='drink.php?b=dn&o=a'>&#9650</a></th></th><th>Style <a href='drink.php?b=s&o=d'>&#9660</a><a href='drink.php?b=s&o=a'>&#9650</a></th><th>Average Rating <a href='drink.php?b=ar&o=d'>&#9660</a><a href='drink.php?b=ar&o=a'>&#9650</a></th></th><th>Number of Reviews <a href='drink.php?b=nr&o=d'>&#9660</a><a href='drink.php?b=nr&o=a'>&#9650</a></th>$validSessionHeaders</tr></thead><tbody>";
 
+//Create table rows from drink models
 foreach($models as $model) {
     $id = $model->getId();
     $name = $model->getName();
@@ -52,6 +62,7 @@ foreach($models as $model) {
     $content .= "<tr><td><a href='drink.php?d=$id'>$name</a></td><td>$style</td><td>$averageRating</td><td>$reviewCount</td>$userRating</tr>";
 }
 
+//Finish creating table
 $content .= "</tbody></table>";
 
 ?>

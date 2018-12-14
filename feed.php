@@ -8,6 +8,7 @@ require_once "sessionAuth.php";
 
 $title = "Your Feed";
 
+//html
 $content = <<<EOF
     <div class='new-post row'>
         <div class='col-md-2'>
@@ -92,10 +93,12 @@ $content = <<<EOF
     </script>
 EOF;
 
+//User friends
 $friends = FriendQuery::create()
     ->select('Friend.Friend_Username')
     ->findByUsername($_SESSION['username']);
 
+//First 20 posts by user or their friends
 $initialFeedPosts = PostQuery::create()
     ->where('Post.Username IN ?', $friends)
     ->_or()
@@ -104,8 +107,8 @@ $initialFeedPosts = PostQuery::create()
     ->limit(20)
     ->find();
 
+//Generate feed from post models
 $initialFeed = "";
-
 foreach($initialFeedPosts as $post) {
     $username = $post->getUsername();
     $timestamp = $post->getCreationtime()->format('Y-m-d H:i:s');
@@ -113,6 +116,8 @@ foreach($initialFeedPosts as $post) {
     $id = "";
     $drink = "";
     $rating = "";
+
+    //If post is a review, include review info
     if(($review = $post->getReview()) !== null) {
         $id = $review->getDrinkId();
         $drink = " &#x3e; <a href='drink.php?d=$id'>" . $review->getDrink()->getName() . "</a>";

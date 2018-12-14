@@ -6,11 +6,15 @@ require_once "vendor/autoload.php";
 require_once "database/generated-conf/config.php";
 require_once "sessionAuth.php";
 
+//Redirect if user not logged in
 if(!SessionAuth::isValid()) header("Location: company.php");
 else {
     $title = 'Add a Company';
 
+    //If not receiving form, display page
     if (!isset($_POST['name'], $_POST['location'], $_POST['description'])) {
+
+        //Form html
         $content = <<<EOT
         <h4>Add A Company</h4>
 		<div class='add-company form-group'>
@@ -37,7 +41,7 @@ else {
                 processData:false,
                 contentType:false,
                 success:function(data) {
-                    console.log(data);
+                    if(data === "Success.") $('form')[0].reset();
                 }
             });
         });
@@ -45,13 +49,18 @@ else {
 EOT;
 
         include 'template.php';
-    } else {
+    }
+    //If receiving form, process it
+    else {
+
+        //New company
         $company = new Company();
         $company
             ->setName($_POST['name'])
             ->setLocation($_POST['location'])
             ->setDescription($_POST['description']);
 
+        //Check for valid picture upload
         if (isset($_FILES['image']) && getimagesize($_FILES['image']['tmp_name']) !== false) {
             if (filesize($_FILES['image']) > 1024 * 1024) {
                 die("ERROR: File exceeds 1 MB.");
@@ -66,7 +75,8 @@ EOT;
             }
         }
 
-        $company->save();
+        //Save company
+        if($company->save()) echo "Success.";
     }
 }
 ?>

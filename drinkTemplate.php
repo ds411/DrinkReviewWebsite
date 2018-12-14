@@ -1,14 +1,18 @@
 <?php
 
+//Valid session
 $validSession = SessionAuth::isValid();
 
+//Drink model from id
 $model = DrinkQuery::create()
     ->leftJoin('Drink.Review')
     ->withColumn('AVG(Review.Rating)', 'averageRating')
     ->findOneById($id);
 
+//Drink name
 $drink = $model->getName();
 
+//Drink picture
 $image = $model->getPicture();
 if($image === null) {
     $image = "noimageavailable.png";
@@ -17,25 +21,39 @@ else {
     $image = "images/" . $image;
 }
 
+//Drink company
 $company = $model->getCompany()->getName();
+//Drink company id
 $company_id = $model->getCompanyId();
+//Drink company in anchor tag
 $company = "<a href='company.php?c=$company_id'>$company</a>";
+
+//Drink style
 $style = $model->getStyleName();
+//Drink style in anchor tag
 $style = "<a href='style.php?s=$style'>$style</a>";
+
+//Drink description
 $description = $model->getDescription();
+
+//Drink average rating
 $averageRating = $model->getVirtualColumn('averageRating');
 
 $title = $drink;
 
+//Page offset
 if(isset($_GET['page'])) $offset = 20 * $_GET['page'];
 else $offset = 0;
 
+//Drink reviews
 $reviewModels = ReviewQuery::create()
     ->filterByDrinkId($id)
+    ->orderByPostId('DESC')
     ->limit(20)
     ->offset($offset)
     ->find();
 
+//Create reviews section from review models
 $reviews = "<div class='review-container'>
 				<h5>Reviews</h5>
 			</div>";
@@ -49,15 +67,21 @@ foreach($reviewModels as $review) {
         "<div class='review-post' style='margin-bottom:1%;'><p><a href='profile.php?u=$username' class='feed-user'>$username</a></p><p>Rating: $rating / 5</p><p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
 }
 
+//Review form is empty by default
 $reviewForm = "";
 
+//If valid login
 if($validSession) {
+
+    //Check if user has reviewed the drink
     $review = ReviewQuery::create()
         ->filterByDrinkId($id)
         ->usePostQuery()
         ->filterByUsername($_SESSION['username'])
         ->endUse()
         ->findOne();
+
+    //If the user has not reviewed the drink, include the review form
     if($review === null) {
         $reviewForm = <<<EOT
         <div class='drink-make-review'>
@@ -82,7 +106,7 @@ EOT;
         }
 }
 
-
+//html
 $content = <<<EOT
 		<div class='jumbotron dc-container'>
 			<div class='row dc-info'>
@@ -113,7 +137,7 @@ $content = <<<EOT
 		        data:$(this).serialize(),
 		        success:function(data) {
 		            if(data.indexOf('<') !== -1) {
-		                $('#drink-reviews').append(data);
+		                $('#drink-reviews').prepend(data);
 		                $('.drink-make-review').remove();
 		            }
 		            else {

@@ -6,26 +6,33 @@ require_once "vendor/autoload.php";
 require_once "database/generated-conf/config.php";
 require_once "sessionAuth.php";
 
+//If u in url
 if(isset($_GET['u'])) {
+    //If user exists with username u, display their page
     if(UserQuery::create()->filterByUsername($_GET['u'])->exists()) {
         $username = $_GET['u'];
     }
+    //Otherwise, redirect to profile.php
     else {
         header("Location: profile.php");
     }
 }
+//If u not in url and valid login, display logged in user's profile
 else if(SessionAuth::isValid()) {
     $username = $_SESSION['username'];
 }
+//If no u in url and user not logged in, redirect to index
 else {
     header("Location: index.php");
 }
 
 $title = "$username's Profile";
 
+//User
 $user = UserQuery::create()
     ->findOneByUsername($username);
 
+//User picture
 $image = $user->getPicture();
 if($image === null) {
     $image = "noimageavailable.png";
@@ -34,12 +41,15 @@ else {
     $image = "images/" . $image;
 }
 
+//User posts
 $postModels = PostQuery::create()
     ->filterByUsername($username)
     ->orderByCreationtime('DESC')
     ->limit(20)
     ->offset(0)
     ->find();
+
+//Generate html from post models
 $posts = "";
 foreach($postModels as $post) {
     $timestamp = $post->getCreationtime()->format('Y-m-d H:i:s');
@@ -56,13 +66,23 @@ foreach($postModels as $post) {
         "<div class='feed-post'><p><a href='profile.php?u=$username' class='feed-user'>$username</a>$drink</p>$rating<p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
 }
 
+//User friends
 $friendModels = $user->getFriendsRelatedByUsername();
+
+//Generate html from friends
 $friends = "";
 foreach($friendModels as $friend) {
     $name = $friend->getFriendUsername();
     $friends .= "<div><a href='profile.php?u=$name' class='list-group-item' >$name</a></div>";
 }
 
+//Follow button does not exist by default
+$followButton = "";
+//Image upload button does not exist by default
+$imageUpload = "";
+
+//If valid session and profile is logged in user's profile,
+// include profile image upload form
 if(SessionAuth::isValid() && $_SESSION['username'] === $username) {
     $imageUpload = <<<EOT
             <div class='imgUpload'>
@@ -92,10 +112,10 @@ if(SessionAuth::isValid() && $_SESSION['username'] === $username) {
             });
             </script>
 EOT;
-    $followButton = "";
+
 }
-else {
-    $imageUpload = "";
+//If profile is not user's and user is logged in, include follow
+else if(SessionAuth::isValid()) {
     if(FriendQuery::create()->filterByUsername($_SESSION['username'])->filterByFriendUsername($username)->exists()) {
         $btnClass = 'btn-danger';
         $btnText = "Unfollow";
@@ -142,7 +162,7 @@ EOT;
     $followButton = sprintf($followButton, $btnClass, $btnText, $username);
 }
 
-
+//html
 $content = <<<EOT
 	<div class='row profile-body'>
 		<div class='col-md-2 profile-info'>

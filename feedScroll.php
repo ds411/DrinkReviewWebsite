@@ -6,13 +6,18 @@ require "vendor/autoload.php";
 require "database/generated-conf/config.php";
 require "sessionAuth.php";
 
+//If valid request
 if(isset($_POST['page'])) {
+
+    //User friends
     $friends = FriendQuery::create()
         ->select(array('Friend.Friend_Username'))
         ->findByUsername($_SESSION['username']);
 
+    //Page offset
     $offset = $_POST['page'] * 10 +  20;
 
+    //Find 10 posts offset by page number
     $feedPosts = PostQuery::create()
         ->where('Post.Username IN ?', $friends)
         ->_or()
@@ -22,12 +27,13 @@ if(isset($_POST['page'])) {
         ->limit(10)
         ->find();
 
+    //If no more posts, tell client to stop requesting posts
     if($feedPosts[0] === null) {
         echo "End.";
     }
+    //If there are more posts, generate html and return it
     else {
         $feed = "";
-
         foreach($feedPosts as $post) {
             $username = $post->getUsername();
             $timestamp = $post->getCreationtime()->format('Y-m-d H:i:s');

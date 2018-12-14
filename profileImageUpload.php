@@ -6,11 +6,14 @@ require_once "vendor/autoload.php";
 require_once "database/generated-conf/config.php";
 require_once "sessionAuth.php";
 
+//If valid login
 if(SessionAuth::isValid()) {
+
+    //Find user
     $user = UserQuery::create()
         ->findOneByUsername($_SESSION['username']);
 
-
+    //Check if picture is valid, upload,  and save
     if (isset($_FILES['image']) && getimagesize($_FILES['image']['tmp_name']) !== false) {
         if (filesize($_FILES['image']) > 1024 * 1024) {
             die("ERROR: File exceeds 1 MB.");

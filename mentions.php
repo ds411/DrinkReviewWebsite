@@ -8,6 +8,7 @@ require_once "sessionAuth.php";
 
 $title = "Your Mentions";
 
+//html
 $content = <<<EOF
     <div class='new-post row'>
         <div class='col-md-2'>
@@ -60,30 +61,24 @@ $content = <<<EOF
     </script>
 EOF;
 
+//Mention string
 $mention = '@' . $_SESSION['username'];
 
+//Find posts containing mention string
 $initialFeedPosts = PostQuery::create()
     ->where("Post.Body LIKE '%>$mention<%'")
     ->orderByCreationtime('DESC')
     ->limit(20)
     ->find();
 
+//Generate feed from posts
 $initialFeed = "";
-
 foreach($initialFeedPosts as $post) {
     $username = $post->getUsername();
     $timestamp = $post->getCreationtime()->format('Y-m-d H:i:s');
     $body = $post->getBody();
-    $id = "";
-    $drink = "";
-    $rating = "";
-    if(($review = $post->getReview()) !== null) {
-        $id = $review->getDrinkId();
-        $drink = " &#x3e; <a href='drink.php?d=$id'>" . $review->getDrink()->getName() . "</a>";
-        $rating = "<p class='rating'>Rating: <b>" . $review->getRating() . " / 5</b></p>";
-    }
     $initialFeed .=
-        "<div class='feed-post'><p><a href='profile.php?u=$username' class='feed-user'>$username</a>$drink</p>$rating<p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
+        "<div class='feed-post'><p><a href='profile.php?u=$username' class='feed-user'>$username</a></p><p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
 }
 
 $content = sprintf($content, $initialFeed);

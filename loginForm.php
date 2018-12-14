@@ -8,6 +8,7 @@ require_once "sessionAuth.php";
 
 $title = "Register or Login";
 
+//html
 $content = <<<EOF
 	<div class='row login-page'>
 		<div class='col register-col form-group'>
@@ -50,7 +51,7 @@ $content = <<<EOF
 		                form.find('.form-errors').html(data);
 		            }
 		            else{
-		                $('.container').html(data);
+		                location.reload();
 		            }
 		        }
 		    });
