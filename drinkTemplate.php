@@ -65,7 +65,7 @@ foreach($reviewModels as $review) {
     $body = $post->getBody();
     $rating = $review->getRating();
     $reviews .=
-        "<div class='review-post' style='margin-bottom:1%;'><p><a href='profile.php?u=$username' class='feed-user'>$name</a></p><p>Rating: $rating / 5</p><p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
+        "<div class='review-post' style='margin-bottom:1%;'><p><a href='profile.php?u=$username' class='feed-user'>$name ($username)</a></p><p>Rating: $rating / 5</p><p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
 }
 
 //Review form is empty by default

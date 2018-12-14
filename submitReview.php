@@ -40,7 +40,7 @@ if($validSession && $review === null) {
     $name = $post->getUser()->getRealName();
 
     //html
-    echo "<div class='review-post'><p><a href='profile.php?u=$username' class='feed-user'>$name</a></p><p>Rating: $rating / 5</p><p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
+    echo "<div class='review-post'><p><a href='profile.php?u=$username' class='feed-user'>$name ($username)</a></p><p>Rating: $rating / 5</p><p class='feed-body'>$body</p><hr/><p class='feed-time'>Posted on $timestamp</p></div>";
 }
 
 ?>

@@ -42,7 +42,7 @@ if(isset($_POST['body']) && SessionAuth::isValid()) {
     $name = $post->getUser()->getRealName();
 
     //html
-    echo "<div class='feed-post'><p><a href='profile/?u=$username'>$name</a></p><p class='feed-body'>$body</p><p class='feed-time'>Posted on $timestamp</p></div>";
+    echo "<div class='feed-post'><p><a href='profile/?u=$username'>$name ($username)</a></p><p class='feed-body'>$body</p><p class='feed-time'>Posted on $timestamp</p></div>";
 }
 else {
     echo "ERROR: You cannot create a post.";

@@ -37,7 +37,7 @@ if(isset($_POST['page'])) {
             $timestamp = $post->getCreationtime()->format('Y-m-d H:i:s');
             $body = $post->getBody();
             $feed .=
-                "<div class='feed-post'><p><a href='profile.php?u=$username' class='feed-user'>$name</a></p><p class='feed-body'>$body</p><p class='feed-time'>Posted on $timestamp</p></div>";
+                "<div class='feed-post'><p><a href='profile.php?u=$username' class='feed-user'>$name ($username)</a></p><p class='feed-body'>$body</p><p class='feed-time'>Posted on $timestamp</p></div>";
         }
 
         echo $feed;
