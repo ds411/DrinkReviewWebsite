@@ -42,7 +42,7 @@ foreach($models as $model) {
     $id = $model->getId();
     $name = $model->getName();
     $style = $model->getStyleName();
-    $averageRating = !($model->getVirtualColumn('averageRating')) ? '-.--' : $model->getVirtualColumn('averageRating');
+    $averageRating = !($model->getVirtualColumn('averageRating')) ? '-.--' : number_format($model->getVirtualColumn('averageRating'), 2);
     $reviewCount = $model->getVirtualColumn('reviewCount');
     $userRating = "";
     if($validSession) {

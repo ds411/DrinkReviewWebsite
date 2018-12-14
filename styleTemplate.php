@@ -52,6 +52,7 @@ else {
         if(($drinkAvgRating = $drink->getVirtualColumn('averageRating')) === null) {
             $drinkAvgRating = "-.--";
         }
+        else $drinkAvgRating = number_format($drinkAvgRating, 2);
         $reviewCount = $drink->getVirtualColumn('numRatings');
 
         if($validSession) {
